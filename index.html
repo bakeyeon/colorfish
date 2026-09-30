@@ -87,7 +87,7 @@
   .skip { position: absolute; top: var(--px-4); left: var(--px-4); font: 700 12px/16px var(--font-body); color: var(--panel-ink); background: var(--panel); border: 0; border-radius: var(--radius-md); padding: 6px 10px; cursor: pointer; opacity: .85; }
 
   /* FAQ — always on the surface palette, whatever depth the hero left the page at */
-  .faq { --panel: #ffffff; --panel-ink: #0b2a5b; --panel-muted: #3d5f8a; background: var(--sea-400); padding: 96px var(--px-4) 120px; }
+  .faq { --panel: #ffffff; --panel-ink: #0b2a5b; --panel-muted: #3d5f8a; background: var(--sea-400); padding: 96px var(--px-4) 56px; }
   .faq-inner { max-width: 760px; margin: 0 auto; }
   .faq h2 { margin: 0 0 var(--px-4); text-align: center; font: 400 clamp(32px, 4.4vw, 52px)/1.15 var(--font-display); }
   .faq-lede { margin: 0 auto var(--px-6); max-width: 560px; text-align: center; font: 700 16px/26px var(--font-body); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); }
@@ -246,6 +246,10 @@
     .pa-then { transform: none; }
   }
 
+  .thanks { background: var(--sea-400); padding: 0 var(--px-4) 96px; }
+  .thanks-card { max-width: 640px; margin: 0 auto; padding: var(--px-6); text-align: center; background: #ffffffe6; color: var(--panel-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); }
+  .thanks-card h2 { margin: 0 0 var(--px-2); font: 14px/20px var(--font-pixel); color: var(--sea-600); text-transform: uppercase; }
+  .thanks-card p { margin: 0; font: 400 16px/27px var(--font-body); color: var(--panel-muted); }
   .contact { background: var(--sea-600); color: var(--cta-fill); text-align: center; padding: 64px var(--px-4) 72px; }
   .contact h2 { margin: 0 0 var(--px-2); font: 400 clamp(24px, 3vw, 34px)/1.2 var(--font-display); }
   .contact p { margin: 0 0 var(--px-6); font: 400 16px/26px var(--font-body); }
@@ -327,6 +331,13 @@
 
     <div id="faq-list"></div>
 
+  </div>
+</section>
+
+<section class="thanks" id="thanks" aria-labelledby="thanks-title">
+  <div class="thanks-card">
+    <h2 id="thanks-title">Acknowledgments</h2>
+    <p>I’m sincerely grateful to everyone who peer-reviewed this paper during submission, to my supervisors, and to every participant who took the survey. Your feedback and participation helped make this work more rigorous.</p>
   </div>
 </section>
 
