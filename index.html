@@ -224,8 +224,8 @@
   // The seven Color Fish, in the order they swim in. `from` is the side each one enters from
   // (chosen so the sprite swims head-first).
   var FISH = [
-    { id: 'mola', from: 'left' }, { id: 'puffer', from: 'right' }, { id: 'bluemarlin', from: 'left' },
-    { id: 'mandarinfish', from: 'right' }, { id: 'flatfish', from: 'right' }, { id: 'loach', from: 'right', scale: 0.7 },
+    { id: 'mola', from: 'left' }, { id: 'puffer', from: 'right', scale: 0.9 }, { id: 'bluemarlin', from: 'left', scale: 0.9 },
+    { id: 'mandarinfish', from: 'right' }, { id: 'flatfish', from: 'right', scale: 0.9 }, { id: 'loach', from: 'right', scale: 0.63 },
     { id: 'squid', from: 'below' }
   ];
   // Result-page personas from the test platform (ResultSummary), shown when a fish is clicked
@@ -262,7 +262,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var W = 480, H = 270, S = 4, U = 1;
 
-  var img = {}, names = ['bg', 'squid_wink', 'boat', 'anchor', 'rope', 'chest'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
+  var img = {}, names = ['bg', 'squid_wink', 'boat'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
   names.forEach(function (n) {
     var im = new Image();
     im.onload = im.onerror = function () { if (--pending === 0) start(); };
@@ -368,38 +368,17 @@
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // props, anchored to the background so they scroll with it:
-    // a boat on the horizon lowers its anchor as we dive, and a treasure chest waits on the reef
+    // a boat rocks on the horizon, anchored to the background so it sinks out of view as we dive
     var horizon = bh * 0.242 - pan;
-    // the boat sits near the right edge so its anchor line stays clear of the fish formation
-    var boatX = W * (W < H ? 0.84 : 0.9), rockBoat = reduce ? 0 : [0, 1, 0, -1][step] * U * 0.5;
     if (img.boat.width) {
-      var boH = 44 * U, boW = img.boat.width * boH / img.boat.height, hull = horizon + boH * 0.18;
-      var ropeX = Math.min(boatX + boW * 0.32, W - 8 * U);
-      if (img.anchor.width && img.rope.width) {
-        var aH = 30 * U, aW = img.anchor.width * aH / img.anchor.height;
-        var rW = aW * img.rope.width / img.anchor.width, tH = rW * img.rope.height / img.rope.width;
-        var drop = easeOut(seg(p, 0.03, 0.45)) * bh * 0.62, floor = bh * 0.93 - pan - aH;
-        var aTop = Math.min(hull + 4 * U + drop, floor);
-        for (var ry = hull; ry < aTop; ry += tH) ctx.drawImage(img.rope, ropeX - rW / 2, ry, rW, Math.min(tH, aTop - ry + 1));
-        ctx.drawImage(img.anchor, ropeX - aW / 2, aTop - 2, aW, aH);
-      }
-      if (horizon + boH > 0) ctx.drawImage(img.boat, boatX - boW / 2, horizon - boH * 0.82 + rockBoat, boW, boH);
-    }
-    if (img.chest.width) {
-      var cH = 40 * U, cW = img.chest.width * cH / img.chest.height;
-      // on tall screens the chest sits in the open water left of the squid's bubble, clear of the button and note
-      var cBottom = (W < H ? bh - H * 0.38 : bh * 0.985) - pan, cX = W * (W < H ? 0.22 : 0.15);
-      if (cBottom - cH < H) {
-        ctx.drawImage(img.chest, cX - cW / 2, cBottom - cH, cW, cH);
-        // a twinkle hops between a few spots on the gold
-        if (!reduce && p > 0.5) {
-          var tw = [[-0.18, -0.25], [0.12, -0.35], [0.3, -0.12], [-0.02, -0.1]][Math.floor(now / 450) % 4];
-          var sx = cX + tw[0] * cW, sy = cBottom + tw[1] * cH, sz = Math.max(1, U);
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(sx - sz / 2, sy - sz * 1.5, sz, sz * 3);
-          ctx.fillRect(sx - sz * 1.5, sy - sz / 2, sz * 3, sz);
-        }
+      var boH = 44 * U, boW = img.boat.width * boH / img.boat.height;
+      var boatX = W * (W < H ? 0.84 : 0.9), rockBoat = reduce ? 0 : [0, 1, 0, -1][step] * U * 0.5;
+      // on squat screens the camera can't pan far enough to lose it, so it also fades once we're under
+      var boatA = 1 - seg(p, 0.12, 0.3);
+      if (horizon + boH > 0 && boatA > 0) {
+        ctx.globalAlpha = boatA;
+        ctx.drawImage(img.boat, boatX - boW / 2, horizon - boH * 0.82 + rockBoat, boW, boH);
+        ctx.globalAlpha = 1;
       }
     }
 
