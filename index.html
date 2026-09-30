@@ -46,6 +46,11 @@
   .cta:active { translate: 4px 4px; box-shadow: none; }
   .cta:focus-visible { outline: 3px solid var(--title-ink); outline-offset: 3px; }
 
+  /* the squid's speech bubble: anchored above the squid, tail pointing down at it */
+  .say { position: absolute; margin: 0; translate: -78% calc(-100% - 20px); white-space: nowrap; font: 400 clamp(15px, 1.6vw, 20px)/1.25 var(--font-display); color: var(--panel-ink); background: var(--panel); border: 3px solid var(--panel-ink); box-shadow: var(--pixel-drop); padding: 8px 12px; pointer-events: none; opacity: 0; visibility: hidden; }
+  .say::after { content: ""; position: absolute; left: 78%; bottom: -15px; width: 12px; height: 12px; background: var(--panel); border-right: 3px solid var(--panel-ink); border-bottom: 3px solid var(--panel-ink); transform: translateX(-50%) rotate(45deg); }
+  .say.below { translate: -50% 20px; }
+  .say.below::after { left: 50%; bottom: auto; top: -15px; border: 0; border-left: 3px solid var(--panel-ink); border-top: 3px solid var(--panel-ink); }
   .skip { position: absolute; top: var(--px-4); left: var(--px-4); font: 700 12px/16px var(--font-body); color: var(--panel-ink); background: var(--panel); border: 0; border-radius: var(--radius-md); padding: 6px 10px; cursor: pointer; opacity: .85; }
 
   /* FAQ — always on the surface palette, whatever depth the hero left the page at */
@@ -103,6 +108,8 @@
       <a class="cta" href="https://color-vision-spark-en.lovable.app/">Find your Color Fish in 5 minutes!</a>
     </div>
 
+    <p class="say" id="say">I was a squid.<br>What’s yours?</p>
+
     <button class="skip" id="skip" type="button">Skip to FAQ ↓</button>
   </div>
 </section>
@@ -147,7 +154,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var W = 480, H = 270, S = 4, U = 1;
 
-  var img = {}, names = ['bg'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
+  var img = {}, names = ['bg', 'squid_wink'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
   names.forEach(function (n) {
     var im = new Image();
     im.onload = im.onerror = function () { if (--pending === 0) start(); };
@@ -210,6 +217,7 @@
     }
 
     // the fish swim in one by one, then float in formation
+    var squidPos = null, sayA = seg(p, 0.90, 0.96);
     FISH.forEach(function (f, i) {
       var im = img[f.id];
       if (!im || !im.width) return;
@@ -225,8 +233,25 @@
       var swim = reduce || k >= 1 ? 0 : Math.round(Math.sin(t * 14 + i) * 2 * U);
       y += swim + ((i + step) % 2 ? bob : -bob);
       var dh = Math.round(h), dw = Math.round(w);
+      // the squid (the author's own Color Fish) winks while its speech bubble is up
+      if (f.id === 'squid') {
+        squidPos = { x: x, top: y - dh / 2, bottom: y + dh / 2 };
+        if (sayA > 0 && img.squid_wink.width && (reduce || (t % 2.4) < 1.2)) im = img.squid_wink;
+      }
       ctx.drawImage(im, Math.round(x - dw / 2), Math.round(y - dh / 2), dw, dh);
     });
+
+    var say = $('say');
+    say.style.opacity = sayA;
+    say.style.visibility = sayA > 0 && squidPos ? 'visible' : 'hidden';
+    if (squidPos) {
+      var k = cv.clientWidth / W;
+      say.style.left = Math.round(squidPos.x * k) + 'px';
+      // tall screens have fish above the squid but open water below, so the bubble hangs underneath
+      var below = W < H;
+      say.classList.toggle('below', below);
+      say.style.top = Math.round((below ? squidPos.bottom : squidPos.top) * k) + 'px';
+    }
 
     var startA = 1 - seg(p, 0.03, 0.10), endA = seg(p, 0.86, 0.94);
     $('hero-start').style.opacity = startA;
