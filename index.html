@@ -211,6 +211,17 @@
   .d-tick em { font-style: normal; font-weight: 400; color: var(--panel-muted); }
   .d-ours { position: absolute; top: -5px; height: 20px; min-width: 6px; background: var(--sea-600); border-radius: 4px; }
   .d-ours span { position: absolute; bottom: 24px; left: 50%; translate: -30% 0; white-space: nowrap; font: 700 12px/15px var(--font-body); color: var(--sea-600); }
+  /* where the TOST margin comes from: 0.2 x pooled SD */
+  .margin-box { padding: 12px var(--px-4); background: #fff8ec; border: 2px solid #f0d6a8; border-radius: 10px; text-align: center; }
+  .margin-title { margin: 0 0 8px; font: 700 13px/18px var(--font-body); color: #8a5a12; }
+  .margin-eq { margin: 0; display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 6px 12px; }
+  .m-part { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .m-part b { font: 700 22px/1.2 var(--font-body); color: var(--panel-ink); }
+  .m-part small { font: 400 11px/14px var(--font-body); color: var(--panel-muted); }
+  .m-res b { color: #2f6b22; }
+  .m-op { font: 400 22px/1.2 var(--font-body); color: var(--panel-muted); }
+  .margin-ex { margin: 10px 0 0; font: 400 13px/20px var(--font-body); color: var(--panel-ink); }
+  @media (max-width: 720px) { .margin-eq { flex-direction: column; align-items: center; gap: 2px; } }
   .faq-a strong { color: var(--panel-ink); }
 
   /* methods-overview diagram inside the pipeline FAQ answer (adapted from the paper's Figure 6) */
