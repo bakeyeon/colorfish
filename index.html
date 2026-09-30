@@ -224,9 +224,12 @@
     var vw = cv.clientWidth, vh = cv.clientHeight;
     S = Math.max(2, Math.floor(Math.min(vw, vh * 16 / 9) / 480));
     W = Math.ceil(vw / S); H = Math.ceil(vh / S);
-    cv.width = W; cv.height = H;
     U = Math.max(W / 480, Math.min(W / 300, H / 270));
-    ctx.imageSmoothingEnabled = false;
+    // Layout stays in art pixels (W×H), but the canvas itself is drawn at the device's real
+    // resolution. Squeezing the ~250px fish drawings into a low-res canvas broke them up on phones.
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
+    ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
   }
 
   var bubbles = [];
@@ -294,6 +297,8 @@
     // camera: from the sky down to the reef
     var bs = Math.max(W / 576, H * 1.3 / 448), bw = 576 * bs, bh = 448 * bs;
     var pan = Math.round(easeOut(seg(p, 0.02, 0.45)) * (bh - H));
+    // the background is true pixel art: scale it up with hard edges
+    ctx.imageSmoothingEnabled = false;
     if (img.bg.width) ctx.drawImage(img.bg, Math.round((W - bw) / 2), -pan, Math.round(bw), Math.round(bh));
 
     // rising pixel bubbles once we're underwater
@@ -306,6 +311,10 @@
       });
       ctx.globalAlpha = 1;
     }
+
+    // the fish are larger drawings shown smaller, so downscale them smoothly to keep eyes and outlines
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     // the fish swim in one by one, then float in formation
     var squidPos = null, sayA = seg(p, 0.90, 0.96), hits = [];
