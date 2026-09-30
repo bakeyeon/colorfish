@@ -136,6 +136,9 @@
     .hero-end { bottom: 4vh; }
     .hero-end .cta-note { font-size: 11px; line-height: 16px; }
   }
+  /* opening: the boat sails in from the right and the title appears in its wake */
+  .hero.intro .hint, .hero.intro .scroll-note { opacity: 0; }
+  .hero .hint, .hero .scroll-note { transition: opacity .4s steps(4); }
   @media (prefers-reduced-motion: reduce) { .hero .hint { animation: none; } }
 </style>
 <link rel="stylesheet" href="assets/explainers.css">
@@ -264,6 +267,9 @@
   var $ = function (id) { return document.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // the opening plays once on load; scrolling during it skips to the end
+  var INTRO_MS = 3400, introStart = null, heroTitle = document.querySelector('#hero-start h1');
+  if (!reduce) { $('hero-start').classList.add('intro'); heroTitle.style.clipPath = 'inset(-12px -12px -12px 100%)'; }
   var W = 480, H = 270, S = 4, U = 1;
 
   var img = {}, names = ['squid_wink', 'boat'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
@@ -326,6 +332,7 @@
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function seg(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
   function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function sail(t) { return 1 - (1 - t) * (1 - t); }
 
   // final formation: one row on wide screens, 4 + 3 on tall ones
   function fishLayout(i) {
@@ -502,6 +509,8 @@
 
   function render(now) {
     var p = cur, t = now / 1000;
+    if (introStart === null) introStart = now;
+    var iq = reduce ? 1 : clamp((now - introStart) / INTRO_MS, 0, 1);
     var step = reduce ? 0 : Math.floor(now / 250) % 4, bob = [0, 1, 2, 1][step] * U;
 
     ctx.fillStyle = '#0666bf';
@@ -530,14 +539,24 @@
     var horizon = sea.hz - pan;
     if (img.boat.width) {
       var boH = 44 * U, boW = img.boat.width * boH / img.boat.height;
-      var boatX = W * (W < H ? 0.84 : 0.9), rockBoat = reduce ? 0 : [0, 1, 0, -1][step] * U * 0.5;
+      var restX = W * (W < H ? 0.2 : 0.14), rockBoat = reduce ? 0 : [0, 1, 0, -1][step] * U * 0.5;
+      var boatX = restX + (W + boW / 2 - restX) * (1 - sail(iq));
       // on squat screens the camera can't pan far enough to lose it, so it also fades once we're under
       var boatA = 1 - seg(p, 0.12, 0.3);
       if (horizon + boH > 0 && boatA > 0) {
         ctx.globalAlpha = boatA;
         ctx.drawImage(img.boat, boatX - boW / 2, horizon - boH * 0.82 + rockBoat, boW, boH);
+        // a little white wake while it's under way
+        if (iq < 1) {
+          ctx.fillStyle = '#ffffff';
+          for (var wk = 0; wk < 3; wk++) {
+            ctx.globalAlpha = boatA * (1 - iq) * (0.8 - wk * 0.25);
+            ctx.fillRect(Math.round(boatX + boW * 0.42 + wk * 7 * U + ((step + wk) % 2) * U), Math.round(horizon + boH * 0.1), Math.ceil(4 * U), Math.ceil(U));
+          }
+        }
         ctx.globalAlpha = 1;
       }
+      intro(boatX, restX, iq);
     }
 
     // the fish swim in one by one, then float in formation
@@ -597,6 +616,17 @@
     $('hero-end').style.visibility = endA > 0 ? 'visible' : 'hidden';
   }
 
+  // reveal the title from the right, keeping its left edge at the boat until the boat stops
+  function intro(boatX, restX, iq) {
+    var hero = $('hero-start');
+    if (!hero.classList.contains('intro')) return;
+    if (iq >= 1) { heroTitle.style.clipPath = ''; hero.classList.remove('intro'); return; }
+    var cr = cv.getBoundingClientRect(), hr = heroTitle.getBoundingClientRect(), k = cr.width / W;
+    var bx = cr.left + boatX * k, rx = Math.max(cr.left + restX * k, hr.left);
+    var r = clamp((hr.right - bx) / ((hr.right - rx) || 1), 0, 1);
+    heroTitle.style.clipPath = 'inset(-12px -12px -12px ' + Math.round((1 - r) * hr.width) + 'px)';
+  }
+
   function frame(now) {
     cur = reduce ? target : cur + (target - cur) * 0.18;
     if (Math.abs(target - cur) < 0.0005) cur = target;
@@ -622,6 +652,7 @@
   function onScroll() {
     var r = $('dive').getBoundingClientRect(), span = r.height - window.innerHeight;
     target = clamp(-r.top / span, 0, 1);
+    if (target > 0.01 && introStart !== null) introStart = Math.min(introStart, performance.now() - INTRO_MS);
     voyage();
   }
   $('skip').addEventListener('click', function () { $('faq').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
