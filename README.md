@@ -16,7 +16,7 @@ Scroll to dive in: the camera sinks below the surface and the seven Color Fish s
 | `faq.json` | FAQ content. Edit this file to change the questions and answers |
 | `poster.html` | A0 portrait poster (841 × 1189 mm). Open it and use Print → Save as PDF for a one-page A0 PDF |
 | `assets/explainers.css` | Styles for the FAQ figures, shared by the site and the poster |
-| `assets/qr/*.svg` | QR codes on the poster (test, paper, site) |
+| `assets/qr/*.svg` | QR codes on the poster (test, paper, poster, FAQ); each is also a link on the web version |
 | `assets/figs/*.webp` | Illustrations from the talk slides used in the FAQ |
 | `assets/*.png` | The seven fish sprites, the winking squid, the boat and the paper boat. The sea itself is drawn in code (`buildSea` in `index.html`) |
 
