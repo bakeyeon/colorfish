@@ -118,6 +118,31 @@
   .faq-a pre code { display: block; background: none; color: #e6f6ff; padding: 0; white-space: pre; }
   .faq-section { margin: var(--px-12) 0 var(--px-4); font: 14px/20px var(--font-pixel); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); text-transform: uppercase; }
   .faq-section:first-child { margin-top: 0; }
+  /* error-rate formula figure (accuracy FAQ): colour-coded variables with a matching legend */
+  .re-fig { margin: 0; padding: var(--px-4); background: #f5fbff; border: 2px solid #c9dcee; border-radius: 10px; }
+  .re-body { display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap; }
+  .re-formula { display: inline-flex; align-items: center; gap: 10px; font: 700 26px/1 "Noto Serif", Georgia, "Times New Roman", serif; color: var(--panel-ink); }
+  .re-lhs sub, .re-v sub { font-size: .55em; }
+  .re-frac { display: inline-flex; flex-direction: column; align-items: center; }
+  .re-num, .re-den { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px; }
+  .re-num { border-bottom: 2px solid var(--panel-ink); }
+  .re-bar { font-weight: 400; }
+  .re-op { font-weight: 400; color: var(--panel-muted); }
+  .re-v { display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 6px; border-radius: 50%; }
+  .re-v sub { align-self: flex-end; margin: 0 0 6px 1px; line-height: 1; }
+  .re-lhs sub { vertical-align: -0.35em; }
+  .re-nowrap { white-space: nowrap; }
+  .v-b { background: #a9ccf0; } .v-e { background: #b9ddab; } .v-l { background: #ffe08f; }
+  .re-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font: 400 15px/20px var(--font-body); color: var(--panel-ink); }
+  .re-legend li { display: flex; align-items: center; gap: 10px; }
+  .re-legend b { display: inline-block; min-width: 30px; }
+  .re-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 0 1px #9fb6cc; flex: none; }
+  .re-example { margin: var(--px-4) 0 0; padding-top: 12px; border-top: 2px dashed #c9dcee; text-align: center; font: 400 14px/24px var(--font-body); color: var(--panel-ink); }
+  .re-chip { display: inline-block; min-width: 28px; padding: 0 6px; border-radius: 999px; font-weight: 700; text-align: center; }
+  @media (max-width: 720px) {
+    .re-formula { font-size: 22px; }
+    .re-v { min-width: 38px; height: 38px; }
+  }
   .faq-a strong { color: var(--panel-ink); }
 
   /* methods-overview diagram inside the pipeline FAQ answer (adapted from the paper's Figure 6) */
