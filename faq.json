@@ -122,7 +122,7 @@
         {
           "question": "What other robustness checks did you run?",
           "answer": [
-            "<ul><li><strong>Zeros in the data:</strong> 34.3% of trials have R<sub>E</sub> = 0, which a Gamma GLM can’t formally represent. A Tweedie refit keeps the language effect stable (β = 0.132–0.146, p = 0.007–0.012 vs. Gamma β = 0.152).</li><li><strong>Grue-only GLM:</strong> the effect points the same way but isn’t significant on its own (β = 0.218, p = 0.085; only 293 English trials). The Mann–Whitney test on the same subset is significant, so we treat the pooled model as the primary evidence.</li><li><strong>LLM stability:</strong> re-scoring keywords at four temperatures gives median cosine similarity ≈ 0.99, with no significant instability after Bonferroni correction.</li></ul>"
+            "<ul><li><strong>Zeros in the data:</strong> 34.3% of trials are perfect answers, so R<sub>E</sub> = 0. A <em>Gamma</em> model is built for values that are always above zero (like waiting times), so it can’t formally handle a pile of exact zeros. A <em>Tweedie</em> model is a close cousin that allows exact zeros alongside positive values. Refitting with Tweedie keeps the language effect stable (β = 0.132–0.146, p = 0.007–0.012 vs. Gamma β = 0.152).</li><li><strong>Grue-only GLM:</strong> the effect points the same way but isn’t significant on its own (β = 0.218, p = 0.085; only 293 English trials). The Mann–Whitney test on the same subset is significant, so we treat the pooled model as the primary evidence.</li><li><strong>LLM stability:</strong> re-scoring keywords at four temperatures gives median cosine similarity ≈ 0.99, with no significant instability after Bonferroni correction.</li></ul>"
           ]
         },
         {
