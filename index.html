@@ -69,6 +69,18 @@
   .card-headline { margin: 0 0 var(--px-4); font: 400 19px/1.35 var(--font-display); color: var(--sea-600); }
   .card-desc { margin: 0 0 var(--px-4); font: 400 15px/24px var(--font-body); color: var(--panel-muted); white-space: pre-line; }
   .card-advice { margin: 0; font: italic 400 15px/24px var(--font-body); color: var(--panel-ink); }
+  .card-rule { margin: var(--px-4) 0 0; padding-top: var(--px-4); border-top: 2px dashed #c9dcee; font: 700 13px/20px var(--font-body); color: var(--panel-ink); }
+  .card-rule span:first-child { color: var(--sea-600); }
+  .card-note { margin: 4px 0 0; font: 400 12px/18px var(--font-body); color: var(--panel-muted); }
+
+  /* paper-boat progress bar, as in the talk slides' header */
+  .voyage { position: fixed; top: 14px; right: 16px; z-index: 20; width: 188px; height: 34px; padding: 0 14px; background: var(--panel); border-radius: 999px; box-shadow: var(--pixel-drop); }
+  .voyage-line { position: absolute; left: 20px; right: 20px; top: 21px; height: 3px; background: var(--sea-600); }
+  .voyage-stop { position: absolute; top: 15px; width: 15px; height: 15px; margin-left: -7px; background: var(--panel); border: 3px solid var(--sea-600); border-radius: 50%; }
+  .voyage-stop:hover, .voyage-stop:focus-visible { background: var(--sea-100); outline: none; }
+  .voyage-stop.passed { background: var(--sea-600); }
+  .voyage-boat { position: absolute; top: 0; width: 30px; margin-left: -15px; image-rendering: auto; pointer-events: none; transition: left .15s linear; }
+  .voyage-track { position: absolute; left: 20px; right: 20px; top: 0; bottom: 0; }
 
   .skip { position: absolute; top: var(--px-4); left: var(--px-4); font: 700 12px/16px var(--font-body); color: var(--panel-ink); background: var(--panel); border: 0; border-radius: var(--radius-md); padding: 6px 10px; cursor: pointer; opacity: .85; }
 
@@ -142,10 +154,22 @@
         <p class="card-headline" id="card-headline"></p>
         <p class="card-desc" id="card-desc"></p>
         <p class="card-advice" id="card-advice"></p>
+        <p class="card-rule"><span>In the test:</span> <span id="card-rule"></span></p>
+        <p class="card-note">Just for fun. The test’s result types aren’t part of the paper’s analysis.</p>
       </div>
     </div>
   </div>
 </section>
+
+<nav class="voyage" aria-label="Page sections">
+  <div class="voyage-line"></div>
+  <div class="voyage-track" id="voyage-track">
+    <a class="voyage-stop" href="#dive" data-target="dive" aria-label="Dive" title="Dive"></a>
+    <a class="voyage-stop" href="#faq" data-target="faq" aria-label="FAQ" title="FAQ"></a>
+    <a class="voyage-stop" href="#contact" data-target="contact" aria-label="Contact" title="Contact"></a>
+    <img class="voyage-boat" id="voyage-boat" src="assets/paperboat.png" alt="">
+  </div>
+</nav>
 
 <section class="faq" id="faq" aria-labelledby="faq-title">
   <div class="faq-inner">
@@ -158,7 +182,7 @@
   </div>
 </section>
 
-<footer class="contact" aria-labelledby="contact-title">
+<footer class="contact" id="contact" aria-labelledby="contact-title">
   <h2 id="contact-title">Questions about the research?</h2>
   <p>Get in touch with the author.</p>
   <div class="contact-actions">
@@ -180,25 +204,25 @@
   ];
   // Result-page personas from the test platform (ResultSummary), shown when a fish is clicked
   var PERSONAS = {
-    bluemarlin: { name: 'Blue Marlin', title: 'You are a Blue Marlin!', headline: '“Color calls me!”',
+    bluemarlin: { rule: 'Fast · high accuracy · high literacy', name: 'Blue Marlin', title: 'You are a Blue Marlin!', headline: '“Color calls me!”',
       description: 'Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes.',
       advice: 'You have a born visual acuity—a true observer of subtle worlds! Don’t forget to rest your eyes sometimes.' },
-    puffer: { name: 'Pufferfish', title: 'You are a Pufferfish!', headline: '“Whether it’s mint or Tiffany, pretty things are pretty anyway~”',
+    puffer: { rule: 'Medium or slow speed · low accuracy · medium literacy', name: 'Pufferfish', title: 'You are a Pufferfish!', headline: '“Whether it’s mint or Tiffany, pretty things are pretty anyway~”',
       description: 'Round, slow to color differences but stable.',
       advice: 'Taking things easy, you find beauty everywhere. Keep your stability—but let your colors burst when you feel like it!' },
-    mandarinfish: { name: 'Mandarinfish', title: 'You are a Mandarinfish!', headline: '“This is… a little more cobalt.”',
+    mandarinfish: { rule: 'Fast or medium speed · medium-to-high accuracy · high literacy', name: 'Mandarinfish', title: 'You are a Mandarinfish!', headline: '“This is… a little more cobalt.”',
       description: 'Extreme color enthusiast. Rich in language sense.',
       advice: 'You catch every hue and shade! Keep nurturing your artistic sense and communication skills.' },
-    loach: { name: 'Loach', title: 'You are a Loach!', headline: '“More interested in sentence structure than color.”',
+    loach: { rule: 'Any speed · low accuracy · high literacy', name: 'Loach', title: 'You are a Loach!', headline: '“More interested in sentence structure than color.”',
       description: 'Text-centric brain, less sensitive to color.',
       advice: 'Let colors complement your analytical mind; sometimes intuition is the key!' },
-    squid: { name: 'Squid', title: 'You are a Squid!', headline: '“This color… resembles my mood.”',
+    squid: { rule: 'Everyone who doesn’t match another type (the default fish)', name: 'Squid', title: 'You are a Squid!', headline: '“This color… resembles my mood.”',
       description: 'Weak in color recognition but rich in imagination.',
       advice: 'Your poetic mind brings color to the world in its own way!' },
-    flatfish: { name: 'Flatfish', title: 'You are a Flatfish!', headline: '“I see color… but is that important?”',
+    flatfish: { rule: 'Slow · low accuracy · low literacy', name: 'Flatfish', title: 'You are a Flatfish!', headline: '“I see color… but is that important?”',
       description: 'Slow in response, focused on context rather than color.',
       advice: 'You read between the lines! Trust yourself, but don’t ignore the obvious too much.' },
-    mola: { name: 'Mola mola', title: 'You are a mola mola!', headline: '“If the world doesn’t suit me… it’s better to stay still.”',
+    mola: { rule: 'Skipped the task', name: 'Mola mola', title: 'You are a mola mola!', headline: '“If the world doesn’t suit me… it’s better to stay still.”',
       description: 'As a mola mola, you are a delicate marine artist with intuitive judgment and sharp standards!\nYour own way of skipping answers when questions don’t satisfy you,\nthat’s also a sense 💎',
       advice: 'But don’t carry it all by yourself. Sometimes it’s okay to be sloppy!' }
   };
@@ -212,7 +236,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var W = 480, H = 270, S = 4, U = 1;
 
-  var img = {}, names = ['bg', 'squid_wink'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
+  var img = {}, names = ['bg', 'squid_wink', 'boat', 'anchor', 'rope', 'chest'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
   names.forEach(function (n) {
     var im = new Image();
     im.onload = im.onerror = function () { if (--pending === 0) start(); };
@@ -255,6 +279,7 @@
     $('card-headline').textContent = d.headline;
     $('card-desc').textContent = d.description;
     $('card-advice').textContent = d.advice;
+    $('card-rule').textContent = d.rule;
     $('card-back').hidden = false;
     cardOpener = opener;
     $('card-close').focus();
@@ -295,7 +320,8 @@
     ctx.fillRect(0, 0, W, H);
 
     // camera: from the sky down to the reef
-    var bs = Math.max(W / 576, H * 1.3 / 448), bw = 576 * bs, bh = 448 * bs;
+    // tall screens get a taller background so the camera sinks far enough to lose the boat
+    var bs = Math.max(W / 576, H * (W < H ? 1.6 : 1.3) / 448), bw = 576 * bs, bh = 448 * bs;
     var pan = Math.round(easeOut(seg(p, 0.02, 0.45)) * (bh - H));
     // the background is true pixel art: scale it up with hard edges
     ctx.imageSmoothingEnabled = false;
@@ -315,6 +341,40 @@
     // the fish are larger drawings shown smaller, so downscale them smoothly to keep eyes and outlines
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+
+    // props, anchored to the background so they scroll with it:
+    // a boat on the horizon lowers its anchor as we dive, and a treasure chest waits on the reef
+    var horizon = bh * 0.242 - pan;
+    // the boat sits near the right edge so its anchor line stays clear of the fish formation
+    var boatX = W * (W < H ? 0.84 : 0.9), rockBoat = reduce ? 0 : [0, 1, 0, -1][step] * U * 0.5;
+    if (img.boat.width) {
+      var boH = 44 * U, boW = img.boat.width * boH / img.boat.height, hull = horizon + boH * 0.18;
+      var ropeX = Math.min(boatX + boW * 0.32, W - 8 * U);
+      if (img.anchor.width && img.rope.width) {
+        var aH = 30 * U, aW = img.anchor.width * aH / img.anchor.height;
+        var rW = aW * img.rope.width / img.anchor.width, tH = rW * img.rope.height / img.rope.width;
+        var drop = easeOut(seg(p, 0.03, 0.45)) * bh * 0.62, floor = bh * 0.93 - pan - aH;
+        var aTop = Math.min(hull + 4 * U + drop, floor);
+        for (var ry = hull; ry < aTop; ry += tH) ctx.drawImage(img.rope, ropeX - rW / 2, ry, rW, Math.min(tH, aTop - ry + 1));
+        ctx.drawImage(img.anchor, ropeX - aW / 2, aTop - 2, aW, aH);
+      }
+      if (horizon + boH > 0) ctx.drawImage(img.boat, boatX - boW / 2, horizon - boH * 0.82 + rockBoat, boW, boH);
+    }
+    if (img.chest.width) {
+      var cH = 40 * U, cW = img.chest.width * cH / img.chest.height;
+      var cBottom = (W < H ? bh - H * 0.25 : bh * 0.985) - pan, cX = W * (W < H ? 0.24 : 0.15);
+      if (cBottom - cH < H) {
+        ctx.drawImage(img.chest, cX - cW / 2, cBottom - cH, cW, cH);
+        // a twinkle hops between a few spots on the gold
+        if (!reduce && p > 0.5) {
+          var tw = [[-0.18, -0.25], [0.12, -0.35], [0.3, -0.12], [-0.02, -0.1]][Math.floor(now / 450) % 4];
+          var sx = cX + tw[0] * cW, sy = cBottom + tw[1] * cH, sz = Math.max(1, U);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(sx - sz / 2, sy - sz * 1.5, sz, sz * 3);
+          ctx.fillRect(sx - sz * 1.5, sy - sz / 2, sz * 3, sz);
+        }
+      }
+    }
 
     // the fish swim in one by one, then float in formation
     var squidPos = null, sayA = seg(p, 0.90, 0.96), hits = [];
@@ -383,9 +443,22 @@
   // debug: colorfishSeek(0.5) renders that point of the dive without scrolling
   window.colorfishSeek = function (p) { target = cur = clamp(p, 0, 1); render(performance.now()); };
 
+  // the paper boat sails along the whole page; each stop sits where its section starts
+  var stops = [].slice.call(document.querySelectorAll('.voyage-stop'));
+  function voyage() {
+    var max = document.documentElement.scrollHeight - window.innerHeight, pos = clamp(window.scrollY / (max || 1), 0, 1);
+    stops.forEach(function (a) {
+      var at = clamp($(a.dataset.target).offsetTop / (max || 1), 0, 1);
+      a.style.left = (at * 100) + '%';
+      a.classList.toggle('passed', pos >= at - 0.001);
+    });
+    $('voyage-boat').style.left = (pos * 100) + '%';
+  }
+
   function onScroll() {
     var r = $('dive').getBoundingClientRect(), span = r.height - window.innerHeight;
     target = clamp(-r.top / span, 0, 1);
+    voyage();
   }
   $('skip').addEventListener('click', function () { $('faq').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
 
@@ -393,7 +466,7 @@
     resize();
     onScroll();
     cur = target;
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', function () { resize(); voyage(); });
     window.addEventListener('scroll', onScroll, { passive: true });
     requestAnimationFrame(frame);
   }
@@ -435,6 +508,8 @@
           list.appendChild(d);
         });
       });
+      // the FAQ changes the page height: let the progress bar re-measure
+      window.dispatchEvent(new Event('resize'));
     })
     .catch(function () {
       list.innerHTML = '<p class="faq-lede">The FAQ could not be loaded. Serve this folder over http(s) so faq.json can be read.</p>';
