@@ -190,6 +190,27 @@
     .tost-zone span { font-size: 10px; }
     .tost-plot { height: 104px; }
   }
+  /* Cohen's d: two nearly overlapping curves plus a small/medium/large gauge */
+  .d-fig { margin: 0; padding: var(--px-4); background: #f5fbff; border: 2px solid #c9dcee; border-radius: 10px; display: grid; gap: 18px; }
+  .d-curves svg { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto; }
+  .d-kr { fill: #0666bf33; stroke: #0666bf; stroke-width: 2; }
+  .d-en { fill: #e39c4733; stroke: #c0653a; stroke-width: 2; stroke-dasharray: 5 3; }
+  .d-mean { stroke: #0666bf; stroke-width: 1.5; } .d-mean-en { stroke: #c0653a; }
+  .d-base { stroke: var(--panel-ink); stroke-width: 1.5; }
+  .d-key { list-style: none; display: flex; justify-content: center; gap: 18px; margin: 8px 0 0; padding: 0; font: 400 12px/16px var(--font-body); color: var(--panel-ink); }
+  .d-key li { display: flex; align-items: center; gap: 6px; }
+  .d-sw { width: 18px; height: 10px; border-radius: 3px; }
+  .d-kr-sw { background: #0666bf33; border: 2px solid #0666bf; } .d-en-sw { background: #e39c4733; border: 2px dashed #c0653a; }
+  .d-cap { margin: 6px 0 0; text-align: center; font: 400 13px/20px var(--font-body); color: var(--panel-muted); }
+  .d-scale-wrap { padding: 26px 16px 34px; }
+  .d-scale { position: relative; height: 10px; background: #dfe9f3; border-radius: 5px; }
+  .d-zone { position: absolute; top: 0; bottom: 0; background: #b9d4ec; border-radius: 5px 0 0 5px; }
+  .d-tick { position: absolute; top: 10px; width: 0; }
+  .d-tick::before { content: ""; position: absolute; top: -10px; left: -1px; width: 2px; height: 16px; background: var(--panel-ink); }
+  .d-tick span { position: absolute; top: 8px; left: 0; translate: -50% 0; text-align: center; white-space: nowrap; font: 700 12px/15px var(--font-body); color: var(--panel-ink); }
+  .d-tick em { font-style: normal; font-weight: 400; color: var(--panel-muted); }
+  .d-ours { position: absolute; top: -5px; height: 20px; min-width: 6px; background: var(--sea-600); border-radius: 4px; }
+  .d-ours span { position: absolute; bottom: 24px; left: 50%; translate: -30% 0; white-space: nowrap; font: 700 12px/15px var(--font-body); color: var(--sea-600); }
   .faq-a strong { color: var(--panel-ink); }
 
   /* methods-overview diagram inside the pipeline FAQ answer (adapted from the paper's Figure 6) */
