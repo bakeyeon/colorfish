@@ -39,6 +39,7 @@
   .hero p { margin: var(--px-4) 0 0; font: 700 14px/20px var(--font-body); }
   .hero .hint { display: inline-block; margin-top: var(--px-6); font: clamp(14px, 1.5vw, 20px)/1.4 var(--font-pixel); animation: hint 1s steps(2) infinite alternate; }
   @keyframes hint { to { translate: 0 6px; } }
+  .hero .scroll-note { display: block; margin-top: var(--px-2); font: 700 13px/18px var(--font-body); letter-spacing: .04em; text-shadow: 1px 1px 0 var(--sea-600), -1px 1px 0 var(--sea-600), 1px -1px 0 var(--sea-600), -1px -1px 0 var(--sea-600); }
   .hero-end { top: auto; bottom: 10vh; pointer-events: none; }
   .hero-end .cta { pointer-events: auto; }
   .hero-end .cta-note { max-width: 460px; margin: var(--px-4) auto 0; padding: 6px 12px; text-shadow: none; font: 400 12px/18px var(--font-body); color: var(--panel-ink); background: #ffffffe0; border-radius: 8px; }
@@ -158,6 +159,7 @@
     <div class="hero outlined" id="hero-start">
       <h1>What Color Fish<br>are you?</h1>
       <span class="hint">Let’s dive in! ↓</span>
+      <span class="scroll-note">Scroll down</span>
     </div>
 
     <div id="fish-hits"></div>
