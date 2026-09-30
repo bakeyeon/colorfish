@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color Fish Test — The Sea Where Light Disappears</title>
+<meta name="description" content="A pixel-art dive into how we perceive color, and why seeing a color is not the same as feeling it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans:wght@400;700&family=Press+Start+2P&display=swap">
+<style>
+  /* Color Fish Test design tokens (subset) */
+  :root {
+    --sky: #27c3fe; --sea-100: #7ae1f7; --sea-400: #00acf8; --sea-600: #0666bf; --sea-800: #0a3a7a; --abyss-900: #04122b;
+    --spec-red: #e8453c; --spec-orange: #f28c28; --spec-yellow: #f5d33b; --spec-green: #3cc26b; --spec-blue: #2a6fe0; --spec-off: #8aa3bf;
+    --page: #00acf8; --panel: #ffffff; --panel-ink: #0b2a5b; --panel-muted: #3d5f8a;
+    --title-ink: #ffffff; --cta-fill: #eaf6ff; --cta-ink: #0666bf;
+    --px-1: 4px; --px-2: 8px; --px-4: 16px; --px-6: 24px; --px-12: 48px;
+    --radius-md: 12px;
+    --pixel-drop: 4px 4px 0 #0666bf;
+    --font-display: "Jua", "Noto Sans", sans-serif;
+    --font-pixel: "Press Start 2P", ui-monospace, monospace;
+    --font-body: "Noto Sans", system-ui, sans-serif;
+  }
+  [data-theme="abyss"] { --page: #04122b; --panel: #0b1d3f; --panel-ink: #e6f6ff; --panel-muted: #9cc3e6; --spec-off: #3b4f6b; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--page); color: var(--panel-ink); font-family: var(--font-body); }
+
+  .dive { position: relative; height: 800vh; }
+  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--abyss-900); }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+
+  /* outlined display text over water: white alone on sea-400 fails contrast */
+  .outlined { color: var(--title-ink); text-shadow: 3px 0 0 var(--sea-600), -3px 0 0 var(--sea-600), 0 3px 0 var(--sea-600), 0 -3px 0 var(--sea-600), 3px 3px 0 var(--sea-600), -3px 3px 0 var(--sea-600), 3px -3px 0 var(--sea-600), -3px -3px 0 var(--sea-600), 6px 6px 0 var(--sea-600); }
+
+  .hero { position: absolute; left: 0; right: 0; top: 12vh; padding: 0 var(--px-4); text-align: center; pointer-events: none; transition: opacity .3s steps(3); }
+  .hero h1 { margin: 0; font: 400 clamp(32px, 5.4vw, 64px)/1.15 var(--font-display); }
+  .hero p { margin: var(--px-4) 0 0; font: 700 14px/20px var(--font-body); }
+  .hero .hint { display: inline-block; margin-top: var(--px-6); font: 12px/16px var(--font-pixel); animation: hint 1s steps(2) infinite alternate; }
+  @keyframes hint { to { translate: 0 6px; } }
+  .hero.is-end { top: auto; bottom: 8vh; pointer-events: auto; }
+
+  .cta { text-shadow: none; display: inline-block; margin-top: var(--px-6); font: 400 22px/1.3 var(--font-display); color: var(--cta-ink); background: var(--cta-fill); border: 3px solid var(--cta-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); padding: 10px var(--px-6); text-decoration: none; transition: translate .1s steps(2), box-shadow .1s steps(2); }
+  .cta:hover { translate: 2px 2px; box-shadow: 2px 2px 0 var(--sea-600); }
+  .cta:active { translate: 4px 4px; box-shadow: none; }
+  .cta:focus-visible { outline: 3px solid var(--title-ink); outline-offset: 3px; }
+
+  .cap { position: absolute; left: var(--px-12); bottom: var(--px-12); max-width: 440px; background: var(--panel); color: var(--panel-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); padding: var(--px-4); transition: opacity .3s steps(3); }
+  .cap h2 { margin: 0 0 4px; font: 400 clamp(22px, 2.6vw, 32px)/1.2 var(--font-display); }
+  .cap p { margin: 0; font-size: 16px; line-height: 26px; color: var(--panel-muted); }
+
+  .meter { transition: opacity .3s steps(3); position: absolute; top: var(--px-12); right: var(--px-12); background: var(--panel); color: var(--panel-ink); padding: var(--px-4); box-shadow: var(--pixel-drop); font-family: var(--font-pixel); width: 168px; }
+  .meter-read { font-size: 16px; line-height: 24px; margin-bottom: var(--px-2); }
+  .band { display: grid; grid-template-columns: 16px 1fr; gap: var(--px-2); align-items: center; font-size: 8px; line-height: 12px; margin-top: var(--px-1); }
+  .chip { width: 16px; height: 16px; }
+  .band.off { color: var(--panel-muted); text-decoration: line-through; }
+  .band.off .chip { background: var(--spec-off) !important; }
+  .meter-brain { margin-top: var(--px-2); font-size: 8px; line-height: 12px; color: var(--cta-fill); background: var(--sea-600); padding: 4px 6px; text-align: center; visibility: hidden; }
+
+  .tag { position: absolute; top: 14%; font: 12px/16px var(--font-pixel); color: var(--panel-ink); background: var(--panel); padding: 6px 8px; box-shadow: var(--pixel-drop); opacity: 0; transition: opacity .3s steps(3); }
+  .tag.a { left: 25%; translate: -50% 0; } .tag.b { left: 75%; translate: -50% 0; }
+  .q { position: absolute; font: 28px/1 var(--font-pixel); opacity: 0; transition: opacity .2s steps(2); pointer-events: none; }
+
+  .skip { position: absolute; top: var(--px-4); left: var(--px-4); font: 700 12px/16px var(--font-body); color: var(--panel-ink); background: var(--panel); border: 0; border-radius: var(--radius-md); padding: 6px 10px; cursor: pointer; opacity: .85; }
+
+  /* FAQ — always on the surface palette, whatever depth the hero left the page at */
+  .faq { --panel: #ffffff; --panel-ink: #0b2a5b; --panel-muted: #3d5f8a; background: var(--sea-400); padding: 96px var(--px-4) 120px; }
+  .faq-inner { max-width: 760px; margin: 0 auto; }
+  .faq h2 { margin: 0 0 var(--px-4); text-align: center; font: 400 clamp(32px, 4.4vw, 52px)/1.15 var(--font-display); }
+  .faq-lede { margin: 0 auto var(--px-12); max-width: 560px; text-align: center; font: 700 16px/26px var(--font-body); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); }
+  .faq-kicker { display: block; margin-bottom: var(--px-4); text-align: center; font: 12px/16px var(--font-pixel); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); }
+  .faq details { background: var(--panel); color: var(--panel-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); margin-bottom: var(--px-4); }
+  .faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: var(--px-4); align-items: center; padding: var(--px-4) var(--px-6); font: 400 22px/1.3 var(--font-display); }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font: 16px/1 var(--font-pixel); color: var(--sea-600); }
+  .faq details[open] summary::after { content: "-"; }
+  .faq summary:focus-visible { outline: 3px solid var(--sea-600); outline-offset: 3px; border-radius: var(--radius-md); }
+  .faq-a { padding: 0 var(--px-6) var(--px-6); font: 400 16px/27px var(--font-body); color: var(--panel-muted); }
+  .faq-p { margin: 0 0 var(--px-4); } .faq-p:last-child { margin-bottom: 0; }
+  .faq-a ul { margin: 0; padding-left: 1.2em; } .faq-a li { margin-bottom: 6px; }
+  .faq-a a { color: var(--sea-600); font-weight: 700; }
+  .faq-a sub { font-size: .7em; }
+  .faq-a code { font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; background: #eaf6ff; color: var(--panel-ink); padding: 1px 5px; border-radius: 4px; }
+  .faq-a pre { margin: 0; overflow-x: auto; background: var(--abyss-900); border-radius: 8px; padding: var(--px-4); }
+  .faq-a pre code { display: block; background: none; color: #e6f6ff; padding: 0; white-space: pre; }
+  .faq-section { margin: var(--px-12) 0 var(--px-4); font: 14px/20px var(--font-pixel); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); text-transform: uppercase; }
+  .faq-section:first-child { margin-top: 0; }
+  .faq-a strong { color: var(--panel-ink); }
+
+  .contact { background: var(--sea-600); color: var(--cta-fill); text-align: center; padding: 64px var(--px-4) 72px; }
+  .contact h2 { margin: 0 0 var(--px-2); font: 400 clamp(24px, 3vw, 34px)/1.2 var(--font-display); }
+  .contact p { margin: 0 0 var(--px-6); font: 400 16px/26px var(--font-body); }
+  .contact-actions { display: flex; flex-wrap: wrap; gap: var(--px-4); justify-content: center; }
+  .btn-2 { font: 400 18px/1.3 var(--font-display); color: var(--sea-600); background: var(--cta-fill); border-radius: var(--radius-md); box-shadow: 4px 4px 0 var(--abyss-900); padding: 10px var(--px-6); text-decoration: none; transition: translate .1s steps(2), box-shadow .1s steps(2); }
+  .btn-2:hover { translate: 2px 2px; box-shadow: 2px 2px 0 var(--abyss-900); }
+  .btn-2:active { translate: 4px 4px; box-shadow: none; }
+  .btn-2:focus-visible { outline: 3px solid var(--cta-fill); outline-offset: 3px; }
+
+  @media (max-width: 720px) {
+    .dive { height: 600vh; }
+    .cap { left: var(--px-4); right: var(--px-4); bottom: var(--px-4); max-width: none; }
+    .meter { top: var(--px-4); right: var(--px-4); width: auto; padding: var(--px-2); }
+    .meter-read { font-size: 10px; line-height: 14px; margin-bottom: 4px; }
+    .bands { display: flex; gap: 4px; }
+    .band { display: block; margin: 0; } .band span:last-child { display: none; }
+    .chip { width: 12px; height: 12px; display: block; }
+    .cta { font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hero .hint { animation: none; } }
+</style>
+</head>
+<body>
+
+<section class="dive" id="dive" aria-label="The sea where light disappears — a scrolling story">
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+
+    <div class="hero outlined" id="hero">
+      <h1 id="hero-title">What colors does<br>your brain see?</h1>
+      <div id="hero-start"><span class="hint">DIVE ↓</span></div>
+      <div id="hero-end" hidden><a class="cta" href="https://color-vision-spark-en.lovable.app/">Find your Color Fish in 5 minutes!</a></div>
+    </div>
+
+    <div class="cap" id="cap" style="opacity:0"><h2></h2><p></p></div>
+
+    <div class="meter" id="meter" aria-hidden="true">
+      <div class="meter-read" id="meter-read">-000 M</div>
+      <div class="bands" id="bands"></div>
+      <div class="meter-brain" id="meter-brain">BRAIN ON</div>
+    </div>
+
+    <div class="tag a" id="tag-a">BRAIN A</div>
+    <div class="tag b" id="tag-b">BRAIN B</div>
+    <div class="q outlined" id="q">?</div>
+
+    <button class="skip" id="skip" type="button">Skip ↓</button>
+  </div>
+</section>
+
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <div class="faq-inner">
+    <span class="faq-kicker">FAQ</span>
+    <h2 class="outlined" id="faq-title">Seeing a color is not<br>the same as feeling it</h2>
+    <p class="faq-lede">The science behind the dive: language, culture, and the gap between color perception and color emotion.</p>
+
+    <div id="faq-list"></div>
+
+  </div>
+</section>
+
+<footer class="contact" aria-labelledby="contact-title">
+  <h2 id="contact-title">Questions about the research?</h2>
+  <p>Get in touch with the author.</p>
+  <div class="contact-actions">
+    <a class="btn-2" href="mailto:kai.hyeyeon.park@gmail.com?subject=Color%20Fish%20Test">Email the author</a>
+    <a class="btn-2" href="https://www.linkedin.com/in/bakeyeon/" target="_blank" rel="noopener">LinkedIn ↗</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- story data -------------------------------------------------------
+  // scroll progress (0–1) → depth in metres. Descent, darkness, ascent.
+  var KEYS = [[0, 0], [0.08, 0], [0.22, 8], [0.38, 18], [0.52, 30], [0.66, 200], [0.80, 1000], [0.84, 1000], [0.93, 0], [1, 0]];
+  var SCENE_ENDS = [0.08, 0.22, 0.38, 0.52, 0.66, 0.84, 0.93, 1.01];
+  var CAPTIONS = [
+    null,
+    ['Red disappears first', 'Water swallows red light before any other color.'],
+    ['The pufferfish didn’t change', 'Only its color did. Color lives in light, not in things.'],
+    ['But your brain repaints it', 'It guesses the original colors from what little light is left.'],
+    ['Same sea, different colors', 'Every brain, and every culture, paints color its own way.'],
+    ['No light, no color', '…'],
+    ['Which light are you?', 'Different brains, different colors: seven Color Fish.'],
+    null
+  ];
+  var BANDS = [['RED', 'spec-red', 8], ['ORANGE', 'spec-orange', 18], ['YELLOW', 'spec-yellow', 30], ['GREEN', 'spec-green', 100], ['BLUE', 'spec-blue', 1000]];
+  var FISH = [
+    { id: 'mola', glow: '#3ff0ff' }, { id: 'puffer', glow: '#ffe98a' }, { id: 'bluemarlin', glow: '#6cc8ff' },
+    { id: 'mandarinfish', glow: '#ff7a5c' }, { id: 'flatfish', glow: '#ffd08a' }, { id: 'loach', glow: '#d8c8a8', scale: 0.7 },
+    { id: 'squid', glow: '#fff0d8' }
+  ];
+
+  // ---- setup ------------------------------------------------------------
+  var $ = function (id) { return document.getElementById(id); };
+  var cv = $('cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 480, H = 270, S = 4, U = 1;
+
+  BANDS.forEach(function (b) {
+    var el = document.createElement('div');
+    el.className = 'band';
+    el.innerHTML = '<span class="chip" style="background:var(--' + b[1] + ')"></span><span>' + b[0] + '</span>';
+    $('bands').appendChild(el);
+    b.el = el;
+  });
+
+  var img = {}, names = ['bg'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
+  function loadImages() {
+    // Opened as a local file, canvas pixels from assets/*.png can't be read, so the water filter
+    // would silently switch off; use the data-URI copies in assets/sprites.js instead.
+    var local = window.CF_ASSETS || {};
+    names.forEach(function (n) {
+      var im = new Image();
+      im.onload = im.onerror = function () { if (--pending === 0) start(); };
+      im.src = local[n] || 'assets/' + n + '.png';
+      img[n] = im;
+    });
+  }
+  if (location.protocol === 'file:') {
+    var sp = document.createElement('script');
+    sp.src = 'assets/sprites.js';
+    sp.onload = sp.onerror = loadImages;
+    document.head.appendChild(sp);
+  } else {
+    loadImages();
+  }
+
+  function resize() {
+    var vw = cv.clientWidth, vh = cv.clientHeight;
+    S = Math.max(2, Math.floor(Math.min(vw, vh * 16 / 9) / 480));
+    W = Math.ceil(vw / S); H = Math.ceil(vh / S);
+    cv.width = W; cv.height = H;
+    U = Math.max(W / 480, Math.min(W / 300, H / 270));
+    ctx.imageSmoothingEnabled = false;
+  }
+
+  var bubbles = [];
+  for (var i = 0; i < 24; i++) bubbles.push({ x: Math.random(), y: Math.random(), v: 0.02 + Math.random() * 0.04, s: Math.random() < 0.3 ? 2 : 1 });
+
+  // ---- helpers ----------------------------------------------------------
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function seg(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
+  function depthAt(p) {
+    for (var i = 1; i < KEYS.length; i++) {
+      if (p <= KEYS[i][0]) {
+        var a = KEYS[i - 1], b = KEYS[i];
+        return a[1] + (b[1] - a[1]) * ((p - a[0]) / (b[0] - a[0] || 1));
+      }
+    }
+    return 0;
+  }
+  function sceneOf(p) { for (var i = 0; i < SCENE_ENDS.length; i++) if (p < SCENE_ENDS[i]) return i; return 7; }
+  function sprite(name, cx, cy, h, alpha) {
+    var im = img[name];
+    if (!im || !im.width || alpha <= 0) return;
+    var dh = Math.round(h), dw = Math.round(im.width * h / im.height);
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(im, Math.round(cx - dw / 2), Math.round(cy - dh / 2), dw, dh);
+    ctx.globalAlpha = 1;
+  }
+
+  // Sea water filter: per-channel transmission (red dies first, blue last) × sunlight left, plus blue fog.
+  // brain 0–1 = how strongly the viewer's brain re-colours what little light remains (it can't create light).
+  var canFilter = true;
+  function waterFilter(d, brain, x0, x1) {
+    if (!canFilter || d <= 0.05) return;
+    var e = 1 - 0.7 * brain;
+    var tr = Math.pow(Math.exp(-d / 4), e), tg = Math.pow(Math.exp(-d / 45), e), tb = Math.pow(Math.exp(-d / 350), e);
+    var L = Math.exp(-d / 400), k = 0.35 - 0.2 * brain;
+    var mr = tr * L, mg = tg * L, mb = tb * L, og = 255 * 0.42 * (1 - tg) * L * k, ob = 255 * 0.78 * (1 - tb) * L * k;
+    var w = x1 - x0;
+    if (w <= 0) return;
+    try {
+      var id = ctx.getImageData(x0, 0, w, H), px = id.data;
+      for (var i = 0; i < px.length; i += 4) {
+        px[i] = px[i] * mr;
+        px[i + 1] = px[i + 1] * mg + og;
+        px[i + 2] = px[i + 2] * mb + ob;
+      }
+      ctx.putImageData(id, x0, 0);
+    } catch (err) { canFilter = false; }
+  }
+
+  function fishLayout(i) {
+    var cols = W < H ? 4 : 7, rows = Math.ceil(FISH.length / cols);
+    var row = Math.floor(i / cols), inRow = row < rows - 1 ? cols : FISH.length - cols * (rows - 1), col = i - row * cols;
+    var cw = W / (cols + 0.5);
+    return {
+      x: W / 2 + (col - (inRow - 1) / 2) * cw,
+      y: H * (W < H ? 0.30 : 0.36) + row * cw * 1.0 + ((i % 2) ? 6 : -6) * U,
+      h: Math.min(48 * U, cw * 0.62, H * 0.2),
+      maxW: cw * 0.92
+    };
+  }
+
+  // ---- frame ------------------------------------------------------------
+  var target = 0, cur = 0, lastCap = -1, lastScene = -1;
+
+  function frame(now) {
+    cur = reduce ? target : cur + (target - cur) * 0.18;
+    if (Math.abs(target - cur) < 0.0005) cur = target;
+    render(now);
+    requestAnimationFrame(frame);
+  }
+
+  function render(now) {
+    var p = cur, d = depthAt(p), sc = sceneOf(p), t = now / 1000;
+    var step = reduce ? 0 : Math.floor(now / 250) % 4, bob = [0, 1, 2, 1][step] * U;
+
+    ctx.fillStyle = '#04122b';
+    ctx.fillRect(0, 0, W, H);
+
+    // camera: sky → reef on the way down, back up on the way home
+    var bs = Math.max(W / 576, H * 1.3 / 448), bw = 576 * bs, bh = 448 * bs;
+    var panT = p < 0.8 ? seg(p, 0.04, 0.45) : 1 - seg(p, 0.84, 0.93);
+    var pan = Math.round(panT * (bh - H));
+    if (img.bg.width) ctx.drawImage(img.bg, Math.round((W - bw) / 2), -pan, Math.round(bw), Math.round(bh));
+
+    // rising pixel bubbles (underwater only)
+    if (!reduce && d > 0.5 && d < 400) {
+      ctx.fillStyle = '#7ae1f7';
+      bubbles.forEach(function (b) {
+        var y = ((b.y - t * b.v) % 1 + 1) % 1;
+        ctx.fillRect(Math.round(b.x * W), Math.round(y * H), b.s * Math.ceil(U), b.s * Math.ceil(U));
+      });
+    }
+
+    // the duo: mola (guide) and puffer (the proof)
+    var duoA = 1 - seg(p, 0.70, 0.75);
+    var sink = seg(p, 0, 0.1);
+    var molaY = H * (0.40 + 0.12 * sink) + bob, pufY = H * (0.56 + 0.04 * sink) - bob;
+    var molaX = W * (W < H ? 0.34 : 0.32), pufX = W * (W < H ? 0.70 : 0.64);
+    sprite('mola', molaX, molaY, 110 * U, duoA);
+    sprite('puffer', pufX, pufY, 58 * U, duoA);
+
+    // the seven colour fish, rising from the deep
+    var rise = 1 - seg(p, 0.84, 0.93);
+    var fishPos = FISH.map(function (f, i) {
+      var L = fishLayout(i);
+      var a = p < 0.84 ? 0 : seg(p, 0.84 + i * 0.004, 0.87 + i * 0.004);
+      var y = L.y + rise * H * 0.3 + ((i + step) % 2 ? bob : -bob);
+      var im = img[f.id], h = im.width ? Math.min(L.h, L.maxW * im.height / im.width) : L.h;
+      sprite(f.id, L.x, y, h * (f.scale || 1), a);
+      return { x: L.x, y: y };
+    });
+
+    // light and brain
+    var brain = 0;
+    if (sc === 3 && !reduce) brain = (t % 2.4) < 0.7 ? 1 : 0;
+    if (sc === 4) {
+      var mid = Math.round(W / 2);
+      waterFilter(d, 1, 0, mid);
+      waterFilter(d, 0, mid, W);
+      ctx.fillStyle = '#01000d';
+      ctx.fillRect(mid - Math.ceil(U), 0, Math.ceil(U) * 2, H);
+    } else {
+      waterFilter(d, brain, 0, W);
+    }
+
+    // bioluminescence makes its own light: drawn after the filter
+    FISH.forEach(function (f, i) {
+      var on = seg(p, 0.74 + i * 0.012, 0.75 + i * 0.012) * clamp((d - 150) / 400, 0, 1);
+      if (on <= 0) return;
+      var c = Math.max(2, Math.round(U * 2)), x = Math.round(fishPos[i].x), y = Math.round(fishPos[i].y);
+      var flick = reduce ? 1 : ((Math.floor(now / 300) + i) % 4 === 0 ? 0.6 : 1);
+      ctx.fillStyle = f.glow;
+      ctx.globalAlpha = 0.18 * on * flick;
+      ctx.fillRect(x - c * 1.5, y - c * 1.5, c * 3, c * 3);
+      ctx.globalAlpha = 0.35 * on * flick;
+      ctx.fillRect(x - c, y - c / 2, c * 2, c);
+      ctx.fillRect(x - c / 2, y - c, c, c * 2);
+      ctx.globalAlpha = on;
+      ctx.fillRect(x - c / 2, y - c / 2, c, c);
+      ctx.globalAlpha = 1;
+    });
+
+    ui(p, d, sc, brain, pufX, pufY);
+  }
+
+  // debug: colorfishSeek(0.9) renders that point of the story without scrolling
+  window.colorfishSeek = function (p) { target = cur = clamp(p, 0, 1); render(performance.now()); };
+
+  // ---- DOM overlay ------------------------------------------------------
+  function ui(p, d, sc, brain, pufX, pufY) {
+    document.documentElement.setAttribute('data-theme', d >= 200 ? 'abyss' : 'surface');
+    $('meter-read').textContent = '-' + String(Math.round(d)).padStart(3, '0') + ' M';
+    BANDS.forEach(function (b) { b.el.classList.toggle('off', d >= b[2]); });
+    $('meter').style.opacity = sc === 7 ? 0 : 1;
+    $('meter-brain').style.visibility = brain ? 'visible' : 'hidden';
+
+    var hero = $('hero');
+    if (sc !== lastScene) {
+      var end = sc === 7;
+      hero.classList.toggle('is-end', end);
+      $('hero-title').innerHTML = end ? 'Which fish<br>are you?' : 'What colors does<br>your brain see?';
+      $('hero-start').hidden = end;
+      $('hero-end').hidden = !end;
+      lastScene = sc;
+    }
+    hero.style.opacity = sc === 0 ? 1 - seg(p, 0.04, 0.08) : sc === 7 ? 1 : 0;
+    hero.style.visibility = +hero.style.opacity > 0 ? 'visible' : 'hidden';
+
+    var cap = CAPTIONS[sc], capEl = $('cap');
+    if (cap) {
+      var body = sc === 5 && p > 0.74 ? '…but something is glowing down there.' : cap[1];
+      var key = sc + body;
+      if (key !== lastCap) {
+        capEl.querySelector('h2').textContent = cap[0];
+        capEl.querySelector('p').textContent = body;
+        lastCap = key;
+      }
+      capEl.style.opacity = 1;
+    } else {
+      capEl.style.opacity = 0;
+    }
+
+    $('tag-a').style.opacity = $('tag-b').style.opacity = sc === 4 ? 1 : 0;
+    var q = $('q');
+    q.style.opacity = sc === 2 && p > 0.26 ? 1 : 0;
+    q.style.left = (pufX * S + 16) + 'px';
+    q.style.top = (pufY * S - 58 * U * S * 0.75) + 'px';
+  }
+
+  // ---- scroll -----------------------------------------------------------
+  function onScroll() {
+    var r = $('dive').getBoundingClientRect(), span = r.height - window.innerHeight;
+    target = clamp(-r.top / span, 0, 1);
+  }
+  $('skip').addEventListener('click', function () { $('faq').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
+
+  function start() {
+    resize();
+    onScroll();
+    cur = target;
+    window.addEventListener('resize', resize);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+<script>
+// FAQ: content lives in faq.json — edit that file, not this page.
+(function () {
+  var list = document.getElementById('faq-list');
+  fetch('faq.json', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (data) {
+      // faq.json is written by the site owner, so its HTML is trusted
+      if (data.title) document.getElementById('faq-title').innerHTML = data.title;
+      if (data.lede) document.querySelector('.faq-lede').innerHTML = data.lede;
+      var sections = data.sections || [{ items: data.items || [] }];
+      var first = true;
+      sections.forEach(function (sec) {
+        if (sec.title) {
+          var h = document.createElement('h3');
+          h.className = 'faq-section';
+          h.textContent = sec.title;
+          list.appendChild(h);
+        }
+        (sec.items || []).forEach(function (item) {
+          var d = document.createElement('details');
+          if (first) { d.open = true; first = false; }
+          var sum = document.createElement('summary');
+          sum.textContent = item.question;
+          var a = document.createElement('div');
+          a.className = 'faq-a';
+          [].concat(item.answer || []).forEach(function (para) {
+            var p = document.createElement('div'); // a div, so a paragraph may hold a list
+            p.className = 'faq-p';
+            p.innerHTML = para;
+            a.appendChild(p);
+          });
+          d.appendChild(sum); d.appendChild(a);
+          list.appendChild(d);
+        });
+      });
+    })
+    .catch(function () {
+      list.innerHTML = '<p class="faq-lede">The FAQ could not be loaded. Serve this folder over http(s) so faq.json can be read.</p>';
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+{
+  "_howto": "Edit this file to change the FAQ. 'sections' is a list; each section has a title and items. Each item has a question and an answer; the answer is a list of paragraphs. Inside paragraphs you can use <strong>bold</strong>, <em>italic</em>, <sub>subscript</sub>, <a href=\"...\">links</a> and <ul><li>lists</li></ul>, <code>code</code> and <pre><code>code blocks</code></pre> (write < and > inside code as &lt; and &gt;). Items appear in this order; the first item of the first section starts open. Write quotes inside text as “ ” or \\\".",
+  "title": "Seeing a color is not<br>the same as feeling it",
+  "lede": "Questions and answers on <em>The Grue Divide: When Cognitive Accuracy Doesn’t Predict Affective Alignment</em>.",
+  "sections": [
+    {
+      "title": "The study",
+      "items": [
+        {
+          "question": "What is Color Fish Test?",
+          "answer": [
+            "It’s the web platform we used to collect the data for <em>The Grue Divide</em>. In one session, participants count the blocks in blue color gradients (Study 1: perception), then describe a color scene in their own keywords (Study 2: emotion). At the end they get a playful “Color Fish” type as a thank-you.",
+            "After filtering, the analysis covers <strong>9,534 trials from 1,159 participants</strong>: 904 Korean speakers living in Korea and 255 English speakers living in the US, UK or Australia."
+          ]
+        },
+        {
+          "question": "What is the Sapir–Whorf hypothesis?",
+          "answer": [
+            "Named after linguists Edward Sapir and Benjamin Lee Whorf, it says the language we speak influences how we think.",
+            "The <strong>strong version</strong> (linguistic determinism) says language fixes what we can perceive. Most researchers reject it. The <strong>weak version</strong> (linguistic relativity) says language nudges attention, memory and categorization. Color is a classic testing ground: Russian speakers discriminate blues faster when two shades cross the <em>siniy</em>/<em>goluboy</em> boundary (Winawer et al., 2007)."
+          ]
+        },
+        {
+          "question": "Why did this paper focus on Grue?",
+          "answer": [
+            "<strong>[DRAFT — to be written by the author]</strong>",
+            "Korean <em>pureuda</em> covers blue and green, the “Grue” spectrum, and it shows an unusual asymmetry. It has the fewest derivational variants of the core Korean color categories, yet it is the category recalled most often in spontaneous language production (Lee and Kim, 1996). A category that is lexically economical but cognitively salient is a good place to look for cross-linguistic differences.",
+            "Korean also builds its Grue shades by productive derivation from a single root, unlike Russian’s two independent blue terms. So we used a continuous, block-subdivided gradient rather than a few fixed swatches. Earlier work on Korean–English bilinguals (Deshpande, 2015) looked across the whole color vocabulary rather than isolating Grue as its own boundary."
+          ]
+        },
+        {
+          "question": "What did you find?",
+          "answer": [
+            "<strong>Perception:</strong> Korean speakers made fewer counting errors than the English-speaking cohorts (median error score 0.056 vs. 0.147). The gap is significant within the Grue spectrum and also pooled across all color categories. The effect is small (see <em>Statistical rigor</em>).",
+            "<strong>Emotion:</strong> in the <strong>“Australia Divergence”</strong>, Korean and Australian participants were statistically equivalent in accuracy. Yet in how they described colors emotionally, Australians grouped with the US and UK, not with Korea. Seeing a color boundary with the same precision doesn’t mean feeling it the same way: a <strong>cognitive–affective decoupling</strong>.",
+            "The Australian subsample is small (132 trials), so we present this as an illustrative case for future confirmatory work, not a definitive claim."
+          ]
+        },
+        {
+          "question": "What is the SFF framework?",
+          "answer": [
+            "SFF turns each free-text keyword into a three-dimensional vector: <strong>Sentiment</strong> (valence), <strong>Formality</strong> (social distance) and <strong>Friendliness</strong> (warmth). Gemini 2.5 Flash scores every keyword from −1.0 to 1.0 on each axis and returns the result as JSON.",
+            "Splitting Formality from Friendliness was informally motivated by Korean honorifics, where formal speech doesn’t by itself imply distance. People often use a formal register with close, familiar addressees in public settings."
+          ]
+        },
+        {
+          "question": "What does the dive have to do with it?",
+          "answer": [
+            "The dive pulls apart the physics and the brain. As you go deeper, water absorbs red first, then orange, yellow and green. The pufferfish never changes. Only the light reaching it does.",
+            "At 200 m, two brains repaint the same sea in different ways. That split is the paper in one picture: shared perception, different affective reading."
+          ]
+        },
+        {
+          "question": "Why fish?",
+          "answer": [
+            "Fish live in a world where color really does change with depth. And a sunfish, a pufferfish or a squid is a lot friendlier than a chart. Each of the seven fish stands for one feedback type in the test."
+          ]
+        },
+        {
+          "question": "Is this a medical color vision test?",
+          "answer": [
+            "No. Color Fish Test is a research instrument with playful feedback. It doesn’t diagnose color vision deficiency. For that, see an eye-care professional."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Behind the platform",
+      "items": [
+        {
+          "question": "How did you recruit so many participants?",
+          "answer": [
+            "<strong>1. Make something people want to try.</strong> People love a test that tells them something about themselves. So Color Fish Test lets you measure your own color perception and see your result, your Color Fish type, right away. Curiosity does most of the recruiting.",
+            "<strong>2. Keep the ads simple.</strong> We ran paid social ads, mainly on X. In the X Ads Manager, pick a campaign objective that optimizes for people engaging with or visiting your platform, then set your target audience. After that:<ul><li>Check the numbers every day to see whether participation keeps rising.</li><li>Try switching the optimization goal (e.g., from clicks to views) and keep whichever metric performs best.</li><li>Use the AI-driven optimization options now built into ad tools. They can bring in noticeably more participants.</li></ul>",
+            "We also used Prolific, HelloTalk ads and unpaid LinkedIn posts. In total the ads reached over 339K people (EN 94K, KR 245K) for about €300."
+          ]
+        },
+        {
+          "question": "Can I collect responses in Google Sheets without writing a backend?",
+          "answer": [
+            "Yes. If you can’t build a server, <strong>Google Apps Script</strong> can turn a Google Sheet into a simple data endpoint. Each submission becomes a new row.",
+            "<ul><li>Create a Google Sheet with a tab named <code>responses</code> and a header row.</li><li>Open <strong>Extensions → Apps Script</strong> and paste:</li></ul>",
+            "<pre><code>function doPost(e) {\n  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('responses');\n  const d = JSON.parse(e.postData.contents);\n  sheet.appendRow([d.user_id, d.trial_number, d.actual_blocks,\n                   d.user_estimate, d.duration_seconds]);\n  return ContentService.createTextOutput('ok');\n}</code></pre>",
+            "<ul><li><strong>Deploy → New deployment → Web app</strong>, with <em>Execute as: Me</em> and <em>Who has access: Anyone</em>. Copy the web app URL.</li><li>In your test page, send each trial when it’s submitted:</li></ul>",
+            "<pre><code>fetch('YOUR_WEB_APP_URL', {\n  method: 'POST',\n  body: JSON.stringify({ user_id, trial_number, actual_blocks,\n                         user_estimate, duration_seconds })\n});</code></pre>",
+            "Sending the body as plain text (the default for a string) avoids a CORS preflight, which Apps Script doesn’t answer.",
+            "<strong>Before you go live:</strong> anyone with the URL can post to it, so collect only anonymized data. If you log timestamps, remove them before sharing the dataset, as we did. For larger studies, a real database is sturdier, but a Sheet is plenty for a pilot."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Statistical rigor",
+      "items": [
+        {
+          "question": "What does the data pipeline look like?",
+          "answer": [
+            "<ul><li><strong>Recruit:</strong> Prolific, X, HelloTalk and LinkedIn (2,264 individuals; about €300 in total).</li><li><strong>Filter:</strong> keep participants whose first language matches their country of residence and who have lived there for over 20 years. This leaves 904 KR and 255 EN participants, N = 9,534 trials.</li><li><strong>Study 1:</strong> block counting → error score R<sub>E</sub> and response time.</li><li><strong>Study 2:</strong> keywords for one AI-generated scene per color (Blue, Green, Teal) → Gemini 2.5 Flash scores each keyword into an SFF vector.</li><li><strong>Analyze Study 1:</strong> age weighting, Mann–Whitney U, Kruskal–Wallis, Dunn’s test, GLM, TOST and Bayes factors.</li><li><strong>Analyze Study 2:</strong> per-image SFF means, Euclidean country-pair distances, correlations, K-means.</li><li><strong>Compare</strong> cognitive and affective alignment country by country.</li></ul>",
+            "The LLM enters the pipeline only twice, to generate the scenes and to score keywords. It plays no role in Study 1."
+          ]
+        },
+        {
+          "question": "How is accuracy measured?",
+          "answer": [
+            "Each trial gets a difficulty-weighted relative error: <strong>R<sub>E</sub> = |B<sub>a</sub> − E<sub>u</sub>| / (B<sub>a</sub> × L<sub>d</sub>)</strong>, where B<sub>a</sub> is the true block count, E<sub>u</sub> the participant’s estimate and L<sub>d</sub> the difficulty level (1–3).",
+            "Because the weights {1, 2, 3} are a convention, we re-ran the analysis under three alternative weightings and a fully rank-based measure. The Korean advantage and the KR ≈ AU pattern held every time. The rank-based measure correlates with R<sub>E</sub> at Spearman ρ = 0.971."
+          ]
+        },
+        {
+          "question": "How big are the effects?",
+          "answer": [
+            "Small, and we say so plainly. For error rate, KR vs. all English-speaking participants gives <strong>Cohen’s d = 0.174</strong> (rank-biserial r = 0.211). KR vs. UK is d = 0.200 and KR vs. US is d = 0.181.",
+            "In natural units, the English-speaking cohort’s error rate averages <strong>1.16×</strong> the Korean cohort’s, a 14% lower error rate for Korean speakers, holding covariates fixed. The very small p-values reflect the sample size (n in the thousands), not a dramatic effect."
+          ]
+        },
+        {
+          "question": "How do you show KR and AU are equivalent, not just “not different”?",
+          "answer": [
+            "A non-significant difference isn’t evidence of sameness, so we ran a <strong>Two One-Sided Test (TOST)</strong> with an equivalence margin of ±0.2 pooled SD (±0.068 in R<sub>E</sub> units).",
+            "<ul><li><strong>Error rate: equivalent</strong>, TOST p = 0.003. A bootstrap 90% CI of the median difference, [−0.032, 0.025], falls inside the margin. A Bayes factor of BF<sub>10</sub> = 0.22 (BF<sub>01</sub> ≈ 4.6) is moderate evidence for the null.</li><li><strong>Response duration: not equivalent</strong>, TOST p = 0.625, BF<sub>10</sub> = 2.96.</li></ul>",
+            "The ±0.2 SD margin is the conventional small-effect threshold, not one derived from our data. A stricter or looser margin could change the conclusion."
+          ]
+        },
+        {
+          "question": "How did you handle age and other confounds?",
+          "answer": [
+            "Age strongly predicts error: the 45+ group’s coefficient is β = 0.898, p < 0.001. So we reweighted the English-speaking cohort to match the Korean age distribution, with w(a) = P<sub>KR</sub>(a) / P<sub>EN</sub>(a).",
+            "The main model is a GLM with age group, color category, media type, weekly media hours and country. KR differs from the UK (p = 0.028) and US (p = 0.039) but not from AU (p = 0.973). Refitting with a different reference country gives identical contrasts, so the AU result isn’t an artifact of AU being the baseline."
+          ]
+        },
+        {
+          "question": "What other robustness checks did you run?",
+          "answer": [
+            "<ul><li><strong>Zeros in the data:</strong> 34.3% of trials have R<sub>E</sub> = 0, which a Gamma GLM can’t formally represent. A Tweedie refit keeps the language effect stable (β = 0.132–0.146, p = 0.007–0.012 vs. Gamma β = 0.152).</li><li><strong>Grue-only GLM:</strong> the effect points the same way but isn’t significant on its own (β = 0.218, p = 0.085; only 293 English trials). The Mann–Whitney test on the same subset is significant, so we treat the pooled model as the primary evidence.</li><li><strong>LLM stability:</strong> re-scoring keywords at four temperatures gives median cosine similarity ≈ 0.99, with no significant instability after Bonferroni correction.</li></ul>"
+          ]
+        },
+        {
+          "question": "What are the main limitations?",
+          "answer": [
+            "<ul><li>The study is <strong>exploratory and correlational</strong>: it generates hypotheses rather than establishing causes.</li><li>SFF scores come from an LLM and <strong>haven’t yet been validated against human raters</strong>. Sentiment and Friendliness are highly collinear (r ≈ 0.97–0.98).</li><li>The Australian subsample is small (132 trials).</li><li>Gender couldn’t be linked to the main Korean cohort, and ad delivery skewed over 90% female.</li><li>AI-generated scenes vary in content, so keywords may partly reflect the scene rather than the color.</li><li>Participant-level K-means clusters don’t separate by country (ARI ≤ 0.006). The country divergence comes from country-average SFF profiles.</li></ul>"
+          ]
+        },
+        {
+          "question": "Where can I find the data and code?",
+          "answer": [
+            "The full dataset (N = 9,534), Model Card and Datasheet are on <a href=\"https://osf.io/xub35/\" target=\"_blank\" rel=\"noopener\">OSF</a>. The experimental platform’s source code is on <a href=\"https://github.com/bakeyeon/colorfish_public\" target=\"_blank\" rel=\"noopener\">GitHub</a>."
+          ]
+        }
+      ]
+    }
+  ]
+}
