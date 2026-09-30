@@ -71,9 +71,6 @@
   .card-headline { margin: 0 0 var(--px-4); font: 400 19px/1.35 var(--font-display); color: var(--sea-600); }
   .card-desc { margin: 0 0 var(--px-4); font: 400 15px/24px var(--font-body); color: var(--panel-muted); white-space: pre-line; }
   .card-advice { margin: 0; font: italic 400 15px/24px var(--font-body); color: var(--panel-ink); }
-  .card-rule { margin: var(--px-4) 0 0; padding-top: var(--px-4); border-top: 2px dashed #c9dcee; font: 700 13px/20px var(--font-body); color: var(--panel-ink); }
-  .card-rule span:first-child { color: var(--sea-600); }
-  .card-note { margin: 4px 0 0; font: 400 12px/18px var(--font-body); color: var(--panel-muted); }
 
   /* paper-boat progress bar, as in the talk slides' header */
   .voyage { position: fixed; top: 14px; right: 16px; z-index: 20; width: 188px; height: 34px; padding: 0 14px; background: var(--panel); border-radius: 999px; box-shadow: var(--pixel-drop); }
@@ -175,8 +172,6 @@
         <p class="card-headline" id="card-headline"></p>
         <p class="card-desc" id="card-desc"></p>
         <p class="card-advice" id="card-advice"></p>
-        <p class="card-rule"><span>In the test:</span> <span id="card-rule"></span></p>
-        <p class="card-note">Just for fun. The test’s result types aren’t part of the paper’s analysis.</p>
       </div>
     </div>
   </div>
@@ -242,25 +237,25 @@
   ];
   // Result-page personas from the test platform (ResultSummary), shown when a fish is clicked
   var PERSONAS = {
-    bluemarlin: { rule: 'Fast · high accuracy · high literacy', name: 'Blue Marlin', title: 'You are a Blue Marlin!', headline: '“Color calls me!”',
+    bluemarlin: { name: 'Blue Marlin', title: 'You are a Blue Marlin!', headline: '“Color calls me!”',
       description: 'Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes.',
       advice: 'You have a born visual acuity—a true observer of subtle worlds! Don’t forget to rest your eyes sometimes.' },
-    puffer: { rule: 'Medium or slow speed · low accuracy · medium literacy', name: 'Pufferfish', title: 'You are a Pufferfish!', headline: '“Whether it’s mint or Tiffany, pretty things are pretty anyway~”',
+    puffer: { name: 'Pufferfish', title: 'You are a Pufferfish!', headline: '“Whether it’s mint or Tiffany, pretty things are pretty anyway~”',
       description: 'Round, slow to color differences but stable.',
       advice: 'Taking things easy, you find beauty everywhere. Keep your stability—but let your colors burst when you feel like it!' },
-    mandarinfish: { rule: 'Fast or medium speed · medium-to-high accuracy · high literacy', name: 'Mandarinfish', title: 'You are a Mandarinfish!', headline: '“This is… a little more cobalt.”',
+    mandarinfish: { name: 'Mandarinfish', title: 'You are a Mandarinfish!', headline: '“This is… a little more cobalt.”',
       description: 'Extreme color enthusiast. Rich in language sense.',
       advice: 'You catch every hue and shade! Keep nurturing your artistic sense and communication skills.' },
-    loach: { rule: 'Any speed · low accuracy · high literacy', name: 'Loach', title: 'You are a Loach!', headline: '“More interested in sentence structure than color.”',
+    loach: { name: 'Loach', title: 'You are a Loach!', headline: '“More interested in sentence structure than color.”',
       description: 'Text-centric brain, less sensitive to color.',
       advice: 'Let colors complement your analytical mind; sometimes intuition is the key!' },
-    squid: { rule: 'Everyone who doesn’t match another type (the default fish)', name: 'Squid', title: 'You are a Squid!', headline: '“This color… resembles my mood.”',
+    squid: { name: 'Squid', title: 'You are a Squid!', headline: '“This color… resembles my mood.”',
       description: 'Weak in color recognition but rich in imagination.',
       advice: 'Your poetic mind brings color to the world in its own way!' },
-    flatfish: { rule: 'Slow · low accuracy · low literacy', name: 'Flatfish', title: 'You are a Flatfish!', headline: '“I see color… but is that important?”',
+    flatfish: { name: 'Flatfish', title: 'You are a Flatfish!', headline: '“I see color… but is that important?”',
       description: 'Slow in response, focused on context rather than color.',
       advice: 'You read between the lines! Trust yourself, but don’t ignore the obvious too much.' },
-    mola: { rule: 'Skipped the task', name: 'Mola mola', title: 'You are a mola mola!', headline: '“If the world doesn’t suit me… it’s better to stay still.”',
+    mola: { name: 'Mola mola', title: 'You are a mola mola!', headline: '“If the world doesn’t suit me… it’s better to stay still.”',
       description: 'As a mola mola, you are a delicate marine artist with intuitive judgment and sharp standards!\nYour own way of skipping answers when questions don’t satisfy you,\nthat’s also a sense 💎',
       advice: 'But don’t carry it all by yourself. Sometimes it’s okay to be sloppy!' }
   };
@@ -318,7 +313,6 @@
     $('card-headline').textContent = d.headline;
     $('card-desc').textContent = d.description;
     $('card-advice').textContent = d.advice;
-    $('card-rule').textContent = d.rule;
     $('card-back').hidden = false;
     cardOpener = opener;
     $('card-close').focus();
