@@ -14,7 +14,7 @@ Scroll to dive in: the camera sinks below the surface and the seven Color Fish s
 | --- | --- |
 | `index.html` | The whole page: scroll dive (canvas), FAQ loader, contact footer |
 | `faq.json` | FAQ content. Edit this file to change the questions and answers |
-| `assets/*.png` | Background and the seven fish sprites |
+| `assets/*.png` | The seven fish sprites, the winking squid, the boat and the paper boat. The sea itself is drawn in code (`buildSea` in `index.html`) |
 
 ## Run locally
 

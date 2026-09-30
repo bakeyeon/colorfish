@@ -262,7 +262,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var W = 480, H = 270, S = 4, U = 1;
 
-  var img = {}, names = ['bg', 'squid_wink', 'boat'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
+  var img = {}, names = ['squid_wink', 'boat'].concat(FISH.map(function (f) { return f.id; })), pending = names.length;
   names.forEach(function (n) {
     var im = new Image();
     im.onload = im.onerror = function () { if (--pending === 0) start(); };
@@ -280,6 +280,7 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 3);
     cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
     ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+    buildSea();
   }
 
   var bubbles = [];
@@ -338,6 +339,164 @@
 
   var target = 0, cur = 0;
 
+  // ---- the sea, drawn in code on the art-pixel grid ----------------------
+  // Everything static (sky, water bands, light rays, reef, coral) is painted once per resize into an
+  // offscreen canvas at art resolution, then scaled up with hard edges, so it stays crisp at any
+  // screen size or shape. Clouds, surface glints, seaweed and distant fish are drawn live on top.
+  var SEA = {
+    sky: ['#27c3fe', '#45cdfe', '#6ad8fe'],
+    water: ['#1ab8fb', '#10b2f9', '#06abf6', '#00a3f1', '#009beb', '#0092e4', '#0289dc', '#0480d3', '#0577ca', '#066ec2'],
+    reefBack: '#0b7fd0', reefMid: '#0666bf', reefFront: '#0a4f9e',
+    floor: '#00c8f6', floorLight: '#5fe3fb',
+    coral: ['#035fba', '#0a4f9e', '#f58ac8', '#b38cf0', '#9fe8ff'],
+    weed: '#0f97ad', glint: '#b8f1ff', cloud: '#ffffff', cloudShade: '#cdeffd'
+  };
+  var sea = { layer: null, WH: 0, hz: 0, floorY: 0, clouds: [], glints: [], weeds: [], smallFish: [] };
+
+  // a small seeded random so the scene is the same every time for a given size
+  function rng(seed) { return function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; }
+
+  function buildSea() {
+    var R = rng(20260930 + W * 7 + H);
+    sea.WH = Math.round(H * (W < H ? 2.3 : 2.0));
+    sea.hz = Math.round(H * 0.36);
+    sea.floorY = sea.WH - Math.round(H * 0.3);
+    var c = document.createElement('canvas');
+    c.width = W; c.height = sea.WH;
+    var g = c.getContext('2d');
+    function rect(x, y, w, h, col) { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+    // stepped bands with a two-row checker dither at each boundary, the classic pixel-art gradient
+    function bands(y0, y1, cols) {
+      var n = cols.length, bh = (y1 - y0) / n;
+      for (var i = 0; i < n; i++) rect(0, y0 + i * bh, W, bh + 1, cols[i]);
+      for (var j = 1; j < n; j++) {
+        var by = Math.round(y0 + j * bh);
+        // above the boundary: sprinkle the next colour in at 25% then 50%; below it: the previous one at 25%
+        g.fillStyle = cols[j];
+        for (var x = 0; x < W; x += 4) { g.fillRect(x + 2, by - 4, 1, 1); g.fillRect(x, by - 3, 1, 1); }
+        for (x = 0; x < W; x += 2) { g.fillRect(x + ((by >> 0) % 2), by - 2, 1, 1); g.fillRect(x + 1 - ((by >> 0) % 2), by - 1, 1, 1); }
+        g.fillStyle = cols[j - 1];
+        for (x = 0; x < W; x += 4) { g.fillRect(x + 1, by, 1, 1); g.fillRect(x + 3, by + 1, 1, 1); }
+      }
+    }
+    bands(0, sea.hz, SEA.sky);
+    rect(0, sea.hz, W, 1, '#c9f4ff');
+    rect(0, sea.hz + 1, W, 1, '#62d6ff');
+    bands(sea.hz + 2, sea.floorY, SEA.water);
+
+    // soft diagonal light rays under the surface
+    g.globalAlpha = 0.07;
+    for (var r = 0; r < 5; r++) {
+      var rx = R() * W * 1.1 - W * 0.1, rw = 10 + R() * 18, len = H * (0.6 + R() * 0.5);
+      for (var ry = 0; ry < len; ry += 2) rect(rx + ry * 0.35, sea.hz + 2 + ry, rw, 2, '#ffffff');
+    }
+    g.globalAlpha = 1;
+
+    // reef: three silhouettes built from stepped columns, back to front
+    function ridge(base, amp, col, stepW, edge) {
+      // wavelengths in art pixels (not screen fractions), so narrow screens don't get spiky hills
+      var f1 = 6.283 / (140 + R() * 80), f2 = 6.283 / (55 + R() * 30), f3 = 6.283 / (24 + R() * 10);
+      var p1 = R() * 6.283, p2 = R() * 6.283, p3 = R() * 6.283;
+      for (var x = 0; x < W; x += stepW) {
+        var h = amp * (0.55 + 0.28 * Math.sin(x * f1 + p1) + 0.12 * Math.sin(x * f2 + p2) + 0.05 * Math.sin(x * f3 + p3));
+        h = Math.round(h / 2) * 2;
+        rect(x, base - h, stepW, sea.WH - base + h, col);
+        if (edge) rect(x, base - h, stepW, 1, edge);
+      }
+    }
+    var RA = Math.min(H, W * 0.56); // reef height scale, capped on tall screens
+    ridge(sea.floorY + 2, RA * 0.2, SEA.reefBack, 4, '#1a90dc');
+    ridge(sea.floorY + H * 0.08, RA * 0.13, SEA.reefMid, 4, '#1277c8');
+    // the bright lagoon floor, with sandy light streaks
+    rect(0, sea.floorY + H * 0.16, W, sea.WH, SEA.floor);
+    for (var s = 0; s < W / 6; s++) rect(R() * W, sea.floorY + H * (0.17 + R() * 0.12), 3 + R() * 10, 1, SEA.floorLight);
+    // round rocks resting on the floor
+    for (var rk = 0; rk < Math.max(4, Math.round(W / 70)); rk++) {
+      var rkx = R() * W, rky = sea.floorY + H * (0.2 + R() * 0.08), rr = 4 + Math.floor(R() * 6);
+      for (var dy = -rr; dy <= 0; dy++) {
+        var half = Math.round(Math.sqrt(rr * rr - dy * dy) * 1.4);
+        rect(rkx - half, rky + dy, half * 2, 1, dy < -rr * 0.6 ? '#2a8fd6' : '#0a6bbf');
+      }
+    }
+    ridge(sea.WH - H * 0.03, RA * 0.07, SEA.reefFront, 4, '#0d5fb0');
+
+    // branching corals rooted on the reef
+    function coral(x, y, len, dir, depth, col) {
+      var cx = x, cy = y;
+      for (var i = 0; i < len; i++) {
+        rect(cx, cy, 3, 2, col);
+        cy -= 2; if (i % 2) cx += dir;
+      }
+      rect(cx, cy - 1, 3, 1, col);
+      if (depth > 0) {
+        coral(cx, cy, Math.max(2, len - 2), -1, depth - 1, col);
+        coral(cx, cy, Math.max(2, len - 2), 1, depth - 1, col);
+      }
+    }
+    var nCoral = Math.max(7, Math.round(W / 40));
+    for (var k = 0; k < nCoral; k++) {
+      var col = SEA.coral[Math.floor(R() * SEA.coral.length)];
+      coral(R() * W, sea.WH - H * (0.01 + R() * 0.07), 4 + Math.floor(R() * 5), R() < 0.5 ? -1 : 1, 2 + (R() < 0.4 ? 1 : 0), col);
+    }
+    sea.layer = c;
+
+    // live pieces
+    sea.clouds = [];
+    for (var q = 0; q < Math.max(4, Math.round(W / 110)); q++) sea.clouds.push({ x: R() * W, y: sea.hz * (0.12 + R() * 0.55), w: 22 + R() * 36, v: 1.5 + R() * 2.5 });
+    sea.glints = [];
+    for (var q2 = 0; q2 < W / 12; q2++) sea.glints.push({ x: R() * W, y: sea.hz + 3 + Math.pow(R(), 2) * H * 0.25, w: 3 + R() * 10, ph: Math.floor(R() * 4) });
+    sea.weeds = [];
+    for (var q3 = 0; q3 < Math.max(6, Math.round(W / 40)); q3++) sea.weeds.push({ x: R() * W, base: sea.WH - H * (0.01 + R() * 0.08), h: H * (0.06 + R() * 0.1), ph: R() * 6 });
+    sea.smallFish = [];
+    for (var q4 = 0; q4 < 6; q4++) sea.smallFish.push({ x: R() * W, y: sea.hz + H * (0.35 + R() * 0.9), v: (R() < 0.5 ? -1 : 1) * (3 + R() * 4), s: R() < 0.5 ? 1 : 2 });
+  }
+
+  function cloud(x, y, w) {
+    x = Math.round(x); y = Math.round(y); w = Math.round(w);
+    ctx.fillStyle = SEA.cloud;
+    ctx.fillRect(x + Math.round(w * 0.3), y, Math.round(w * 0.35), 2);
+    ctx.fillRect(x + Math.round(w * 0.12), y + 2, Math.round(w * 0.7), 2);
+    ctx.fillRect(x, y + 4, w, 3);
+    ctx.fillStyle = SEA.cloudShade;
+    ctx.fillRect(x + 2, y + 7, w - 4, 1);
+  }
+
+  function drawSea(pan, t, step) {
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(sea.layer, 0, -pan);
+    // clouds drift across the sky (only while the sky is on screen)
+    if (sea.hz - pan > 0) sea.clouds.forEach(function (c) {
+      var x = ((c.x + (reduce ? 0 : t * c.v)) % (W + c.w * 2)) - c.w;
+      cloud(x, c.y - pan, c.w);
+    });
+    // glints twinkle on and off just under the surface
+    ctx.fillStyle = SEA.glint;
+    sea.glints.forEach(function (gl) {
+      if (!reduce && (step + gl.ph) % 4 === 0) return;
+      var y = Math.round(gl.y - pan);
+      if (y > -2 && y < H) ctx.fillRect(Math.round(gl.x), y, Math.round(gl.w), 1);
+    });
+    // distant fish silhouettes cruise at mid depth
+    ctx.fillStyle = '#0666bf';
+    sea.smallFish.forEach(function (f) {
+      var x = Math.round((((f.x + (reduce ? 0 : t * f.v)) % (W + 20)) + W + 20) % (W + 20) - 10), y = Math.round(f.y - pan), s = f.s;
+      if (y < -6 || y > H + 6) return;
+      var tail = f.v > 0 ? -2 * s : 3 * s;
+      ctx.fillRect(x, y, 3 * s, 2 * s);
+      ctx.fillRect(x + tail, y, s, 2 * s);
+    });
+    // seaweed sways from the reef, one art pixel at a time
+    ctx.fillStyle = SEA.weed;
+    sea.weeds.forEach(function (wd) {
+      var bx = Math.round(wd.x), top = wd.base - wd.h;
+      for (var y = wd.base; y > top; y -= 2) {
+        var sway = reduce ? 0 : Math.round(Math.sin(t * 1.6 + wd.ph + y * 0.15) * ((wd.base - y) / wd.h) * 3);
+        var sy = Math.round(y - pan);
+        if (sy > -2 && sy < H + 2) ctx.fillRect(bx + sway, sy, 3, 2);
+      }
+    });
+  }
+
   function render(now) {
     var p = cur, t = now / 1000;
     var step = reduce ? 0 : Math.floor(now / 250) % 4, bob = [0, 1, 2, 1][step] * U;
@@ -346,12 +505,8 @@
     ctx.fillRect(0, 0, W, H);
 
     // camera: from the sky down to the reef
-    // tall screens get a taller background so the camera sinks far enough to lose the boat
-    var bs = Math.max(W / 576, H * (W < H ? 1.6 : 1.3) / 448), bw = 576 * bs, bh = 448 * bs;
-    var pan = Math.round(easeOut(seg(p, 0.02, 0.45)) * (bh - H));
-    // the background is true pixel art: scale it up with hard edges
-    ctx.imageSmoothingEnabled = false;
-    if (img.bg.width) ctx.drawImage(img.bg, Math.round((W - bw) / 2), -pan, Math.round(bw), Math.round(bh));
+    var pan = Math.round(easeOut(seg(p, 0.02, 0.45)) * (sea.WH - H));
+    drawSea(pan, t, step);
 
     // rising pixel bubbles once we're underwater
     if (!reduce && p > 0.06) {
@@ -369,7 +524,7 @@
     ctx.imageSmoothingQuality = 'high';
 
     // a boat rocks on the horizon, anchored to the background so it sinks out of view as we dive
-    var horizon = bh * 0.242 - pan;
+    var horizon = sea.hz - pan;
     if (img.boat.width) {
       var boH = 44 * U, boW = img.boat.width * boH / img.boat.height;
       var boatX = W * (W < H ? 0.84 : 0.9), rockBoat = reduce ? 0 : [0, 1, 0, -1][step] * U * 0.5;
