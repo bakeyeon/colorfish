@@ -1,8 +1,8 @@
-# Color Fish Test — The Sea Where Light Disappears
+# Color Fish Test — What Color Fish are you?
 
 A scroll-driven pixel-art landing page for **Color Fish Test**, the experimental platform behind the paper *The Grue Divide: When Cognitive Accuracy Doesn't Predict Affective Alignment* (Kai Hyeyeon Park).
 
-Scroll to dive: the deeper you go, the more colors the water takes away. Red goes first, then orange, yellow and green. At the bottom, seven lights become the seven Color Fish.
+Scroll to dive in: the camera sinks below the surface and the seven Color Fish swim in one by one, then the page flows into the FAQ.
 
 - **Take the test:** https://color-vision-spark-en.lovable.app/
 - **Data:** https://osf.io/xub35/
@@ -12,10 +12,9 @@ Scroll to dive: the deeper you go, the more colors the water takes away. Red goe
 
 | Path | What |
 | --- | --- |
-| `index.html` | The whole page: scroll scene (canvas), FAQ loader, contact footer |
+| `index.html` | The whole page: scroll dive (canvas), FAQ loader, contact footer |
 | `faq.json` | FAQ content. Edit this file to change the questions and answers |
 | `assets/*.png` | Background and the seven fish sprites |
-| `assets/sprites.js` | The same images as data URIs, used only when `index.html` is opened as a local file |
 
 ## Run locally
 
@@ -23,7 +22,7 @@ Scroll to dive: the deeper you go, the more colors the water takes away. Red goe
 python -m http.server 8000
 ```
 
-Then open http://localhost:8000. Opening `index.html` directly works for the dive, but the FAQ needs a server to read `faq.json`.
+Then open http://localhost:8000. Opening `index.html` directly shows the dive, but the FAQ needs a server to read `faq.json`.
 
 ## Debug
 
