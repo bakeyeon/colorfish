@@ -90,7 +90,17 @@
   .faq { --panel: #ffffff; --panel-ink: #0b2a5b; --panel-muted: #3d5f8a; background: var(--sea-400); padding: 96px var(--px-4) 120px; }
   .faq-inner { max-width: 760px; margin: 0 auto; }
   .faq h2 { margin: 0 0 var(--px-4); text-align: center; font: 400 clamp(32px, 4.4vw, 52px)/1.15 var(--font-display); }
-  .faq-lede { margin: 0 auto var(--px-12); max-width: 560px; text-align: center; font: 700 16px/26px var(--font-body); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); }
+  .faq-lede { margin: 0 auto var(--px-6); max-width: 560px; text-align: center; font: 700 16px/26px var(--font-body); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); }
+  /* the paper link: a pixel page icon on a CTA-style pill */
+  .paper-link { margin: 0 0 var(--px-12); text-align: center; }
+  .paper-btn { display: inline-flex; align-items: center; gap: 12px; padding: 10px 22px 10px 16px; font: 400 22px/1.2 var(--font-display); color: var(--cta-ink); background: var(--cta-fill); border: 3px solid var(--cta-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); text-decoration: none; transition: translate .1s steps(2), box-shadow .1s steps(2); }
+  .paper-btn:hover { translate: 2px 2px; box-shadow: 2px 2px 0 var(--sea-600); }
+  .paper-btn:active { translate: 4px 4px; box-shadow: none; }
+  .paper-btn:focus-visible { outline: 3px solid var(--title-ink); outline-offset: 3px; }
+  .paper-btn small { font: 12px/1 var(--font-pixel); vertical-align: 2px; margin-left: 4px; }
+  .paper-arrow { margin-left: 6px; font: 700 18px/1 var(--font-body); }
+  .paper-icon { width: 24px; height: 28px; fill: var(--sea-600); flex: none; }
+  .paper-icon .paper-fill { fill: #ffffff; }
   .faq-kicker { display: block; margin-bottom: var(--px-4); text-align: center; font: 12px/16px var(--font-pixel); color: var(--title-ink); text-shadow: 2px 2px 0 var(--sea-600); }
   .faq details { background: var(--panel); color: var(--panel-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); margin-bottom: var(--px-4); }
   .faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: var(--px-4); align-items: center; padding: var(--px-4) var(--px-6); font: 400 22px/1.3 var(--font-display); }
@@ -204,6 +214,12 @@
     <span class="faq-kicker">FAQ</span>
     <h2 class="outlined" id="faq-title">Seeing a color is not<br>the same as feeling it</h2>
     <p class="faq-lede">The science behind the dive: language, culture, and the gap between color perception and color emotion.</p>
+    <div class="paper-link">
+      <a class="paper-btn" href="https://github.com/bakeyeon/colorfish_public/blob/main/The_Grue_Divide__When_Cognitive_Accuracy_Doesn_t_Predict_Affective_Alignment.pdf" target="_blank" rel="noopener">
+        <svg class="paper-icon" viewBox="0 0 12 14" aria-hidden="true" shape-rendering="crispEdges"><path class="paper-fill" d="M1 1h6v4h4v8H1z"/><path d="M1 0h7v1H1zM0 1h1v13H0zM1 13h10v1H1zM11 4h1v9h-1zM8 1h1v1H8zM9 2h1v1H9zM10 3h1v1h-1zM7 1h1v4H7zM7 4h4v1H7zM3 7h6v1H3zM3 9h6v1H3zM3 11h4v1H3z"/></svg>
+        <span>Read the paper <small>PDF</small><span class="paper-arrow" aria-hidden="true">↗</span></span>
+      </a>
+    </div>
 
     <div id="faq-list"></div>
 
