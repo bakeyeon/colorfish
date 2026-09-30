@@ -252,6 +252,19 @@
   .faq-fig img { display: block; width: 100%; height: auto; border: 2px solid #c9dcee; border-radius: 10px; background: #ffffff; }
   .fig-narrow img { max-width: 420px; margin: 0 auto; }
   .faq-fig figcaption { margin-top: 8px; text-align: center; font: 400 13px/20px var(--font-body); color: var(--panel-muted); }
+  /* "big idea" three-step flow */
+  .idea-flow { display: flex; align-items: stretch; gap: 8px; }
+  .idea-step { flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; padding: 12px; background: #f5fbff; border: 2px solid #c9dcee; border-radius: 10px; font: 400 13px/19px var(--font-body); color: var(--panel-muted); }
+  .idea-step b { font: 700 14px/18px var(--font-body); color: var(--panel-ink); }
+  .idea-num { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--sea-600); color: #ffffff; font: 700 12px/1 var(--font-body); }
+  .idea-clue { padding: 6px 8px; background: #ffffff; border-radius: 6px; }
+  .idea-sff { background: #fff4e6; border-color: #f0c08c; }
+  .idea-sff .idea-num { background: #d46a00; }
+  .idea-arrow { align-self: center; font: 700 18px/1 var(--font-body); color: var(--sea-600); }
+  @media (max-width: 720px) {
+    .idea-flow { flex-direction: column; }
+    .idea-arrow { transform: rotate(90deg); }
+  }
   .faq-a strong { color: var(--panel-ink); }
 
   /* methods-overview diagram inside the pipeline FAQ answer (adapted from the paper's Figure 6) */
