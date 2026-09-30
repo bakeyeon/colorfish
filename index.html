@@ -109,6 +109,28 @@
   .faq-section:first-child { margin-top: 0; }
   .faq-a strong { color: var(--panel-ink); }
 
+  /* methods-overview diagram inside the pipeline FAQ answer (adapted from the paper's Figure 6) */
+  .pipe { margin: 0; }
+  .pipe-flow { display: flex; align-items: stretch; gap: 4px; }
+  .pipe-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+  .pipe-col.session { position: relative; padding: 34px 6px 6px; border: 2px dashed var(--sea-600); border-radius: 10px; gap: 2px; }
+  .session-label { position: absolute; top: 3px; left: 4px; right: 4px; text-align: center; font: italic 400 10px/14px var(--font-body); color: var(--panel-muted); }
+  .pb { display: flex; flex-direction: column; gap: 3px; padding: 7px 8px; background: #eaf6ff; border: 2px solid var(--sea-600); border-radius: 8px; font: 400 11px/15px var(--font-body); color: var(--panel-ink); }
+  .pb b { font-weight: 700; font-size: 12px; line-height: 15px; }
+  .pb small { font-size: 11px; color: var(--panel-muted); }
+  .pb.tall { flex: 1; justify-content: center; }
+  .pb.llm { background: #fde6cc; border-color: #d46a00; }
+  .pa { flex: 0 0 auto; align-self: center; font: 700 14px/1 var(--font-body); color: var(--sea-600); }
+  .pa-then { align-self: center; font-size: 11px; line-height: 18px; color: var(--panel-muted); font-weight: 400; }
+  .pipe figcaption { margin-top: 10px; font: 400 12px/18px var(--font-body); color: var(--panel-muted); }
+  .llm-swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; background: #fde6cc; border: 2px solid #d46a00; border-radius: 3px; }
+  @media (max-width: 720px) {
+    .pipe-flow { flex-direction: column; }
+    .pipe-col.session { padding-top: 20px; }
+    .pa { transform: rotate(90deg); }
+    .pa-then { transform: none; }
+  }
+
   .contact { background: var(--sea-600); color: var(--cta-fill); text-align: center; padding: 64px var(--px-4) 72px; }
   .contact h2 { margin: 0 0 var(--px-2); font: 400 clamp(24px, 3vw, 34px)/1.2 var(--font-display); }
   .contact p { margin: 0 0 var(--px-6); font: 400 16px/26px var(--font-body); }
