@@ -22,6 +22,8 @@
     --font-body: "Noto Sans", system-ui, sans-serif;
   }
 
+  /* print-safe body font: web-font Noto Sans came out oddly at small sizes in saved PDFs */
+  :root { --font-body: Arial, Helvetica, sans-serif; }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body { background: #7b8ea3; font-family: var(--font-body); color: var(--panel-ink); }
