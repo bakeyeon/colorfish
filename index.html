@@ -39,7 +39,8 @@
   .hero p { margin: var(--px-4) 0 0; font: 700 14px/20px var(--font-body); }
   .hero .hint { display: inline-block; margin-top: var(--px-6); font: clamp(14px, 1.5vw, 20px)/1.4 var(--font-pixel); animation: hint 1s steps(2) infinite alternate; }
   @keyframes hint { to { translate: 0 6px; } }
-  .hero-end { top: auto; bottom: 10vh; pointer-events: auto; }
+  .hero-end { top: auto; bottom: 10vh; pointer-events: none; }
+  .hero-end .cta { pointer-events: auto; }
 
   .cta { text-shadow: none; display: inline-block; margin-top: var(--px-6); font: 400 22px/1.3 var(--font-display); color: var(--cta-ink); background: var(--cta-fill); border: 3px solid var(--cta-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); padding: 10px var(--px-6); text-decoration: none; transition: translate .1s steps(2), box-shadow .1s steps(2); }
   .cta:hover { translate: 2px 2px; box-shadow: 2px 2px 0 var(--sea-600); }
@@ -51,6 +52,24 @@
   .say::after { content: ""; position: absolute; left: 78%; bottom: -15px; width: 12px; height: 12px; background: var(--panel); border-right: 3px solid var(--panel-ink); border-bottom: 3px solid var(--panel-ink); transform: translateX(-50%) rotate(45deg); }
   .say.below { translate: -50% 20px; }
   .say.below::after { left: 50%; bottom: auto; top: -15px; border: 0; border-left: 3px solid var(--panel-ink); border-top: 3px solid var(--panel-ink); }
+  /* clickable fish: transparent buttons laid over each sprite on the canvas */
+  .fish-hit { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; border-radius: var(--radius-md); }
+  .fish-hit:focus-visible { outline: 3px dashed var(--title-ink); outline-offset: 2px; }
+  .tap-hint { margin: 0; font: 12px/1.4 var(--font-pixel); }
+
+  /* the fish's persona card, as on the test's result page */
+  .card-back { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; padding: var(--px-4); background: #04122b80; }
+  .card-back[hidden] { display: none; }
+  .card { position: relative; width: min(420px, 100%); max-height: calc(100% - 32px); overflow: auto; text-align: center; background: var(--panel); color: var(--panel-ink); border: 3px solid var(--panel-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); padding: var(--px-6); }
+  .card-close { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; font: 20px/1 var(--font-pixel); color: var(--sea-600); background: none; border: 0; cursor: pointer; }
+  .card-close:focus-visible { outline: 3px solid var(--sea-600); border-radius: 8px; }
+  .card-fish { width: 136px; height: 136px; margin: 0 auto var(--px-4); display: grid; place-items: center; background: var(--sea-100); border: 6px solid var(--sea-600); border-radius: 50%; }
+  .card-fish img { max-width: 96px; max-height: 96px; image-rendering: pixelated; }
+  .card h2 { margin: 0 0 var(--px-2); font: 400 28px/1.2 var(--font-display); }
+  .card-headline { margin: 0 0 var(--px-4); font: 400 19px/1.35 var(--font-display); color: var(--sea-600); }
+  .card-desc { margin: 0 0 var(--px-4); font: 400 15px/24px var(--font-body); color: var(--panel-muted); white-space: pre-line; }
+  .card-advice { margin: 0; font: italic 400 15px/24px var(--font-body); color: var(--panel-ink); }
+
   .skip { position: absolute; top: var(--px-4); left: var(--px-4); font: 700 12px/16px var(--font-body); color: var(--panel-ink); background: var(--panel); border: 0; border-radius: var(--radius-md); padding: 6px 10px; cursor: pointer; opacity: .85; }
 
   /* FAQ — always on the surface palette, whatever depth the hero left the page at */
@@ -104,13 +123,27 @@
       <span class="hint">Let’s dive in! ↓</span>
     </div>
 
+    <div id="fish-hits"></div>
+
     <div class="hero hero-end" id="hero-end">
+      <p class="tap-hint outlined">Tap a fish to meet it ↑</p>
       <a class="cta" href="https://color-vision-spark-en.lovable.app/">Find your Color Fish in 5 minutes!</a>
     </div>
 
     <p class="say" id="say">I was a squid.<br>What’s yours?</p>
 
     <button class="skip" id="skip" type="button">Skip to FAQ ↓</button>
+
+    <div class="card-back" id="card-back" hidden>
+      <div class="card" role="dialog" aria-modal="true" aria-labelledby="card-title">
+        <button class="card-close" id="card-close" type="button" aria-label="Close">×</button>
+        <div class="card-fish"><img id="card-img" alt=""></div>
+        <h2 id="card-title"></h2>
+        <p class="card-headline" id="card-headline"></p>
+        <p class="card-desc" id="card-desc"></p>
+        <p class="card-advice" id="card-advice"></p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -145,6 +178,31 @@
     { id: 'mandarinfish', from: 'right' }, { id: 'flatfish', from: 'right' }, { id: 'loach', from: 'right', scale: 0.7 },
     { id: 'squid', from: 'below' }
   ];
+  // Result-page personas from the test platform (ResultSummary), shown when a fish is clicked
+  var PERSONAS = {
+    bluemarlin: { name: 'Blue Marlin', title: 'You are a Blue Marlin!', headline: '“Color calls me!”',
+      description: 'Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes.',
+      advice: 'You have a born visual acuity—a true observer of subtle worlds! Don’t forget to rest your eyes sometimes.' },
+    puffer: { name: 'Pufferfish', title: 'You are a Pufferfish!', headline: '“Whether it’s mint or Tiffany, pretty things are pretty anyway~”',
+      description: 'Round, slow to color differences but stable.',
+      advice: 'Taking things easy, you find beauty everywhere. Keep your stability—but let your colors burst when you feel like it!' },
+    mandarinfish: { name: 'Mandarinfish', title: 'You are a Mandarinfish!', headline: '“This is… a little more cobalt.”',
+      description: 'Extreme color enthusiast. Rich in language sense.',
+      advice: 'You catch every hue and shade! Keep nurturing your artistic sense and communication skills.' },
+    loach: { name: 'Loach', title: 'You are a Loach!', headline: '“More interested in sentence structure than color.”',
+      description: 'Text-centric brain, less sensitive to color.',
+      advice: 'Let colors complement your analytical mind; sometimes intuition is the key!' },
+    squid: { name: 'Squid', title: 'You are a Squid!', headline: '“This color… resembles my mood.”',
+      description: 'Weak in color recognition but rich in imagination.',
+      advice: 'Your poetic mind brings color to the world in its own way!' },
+    flatfish: { name: 'Flatfish', title: 'You are a Flatfish!', headline: '“I see color… but is that important?”',
+      description: 'Slow in response, focused on context rather than color.',
+      advice: 'You read between the lines! Trust yourself, but don’t ignore the obvious too much.' },
+    mola: { name: 'Mola mola', title: 'You are a mola mola!', headline: '“If the world doesn’t suit me… it’s better to stay still.”',
+      description: 'As a mola mola, you are a delicate marine artist with intuitive judgment and sharp standards!\nYour own way of skipping answers when questions don’t satisfy you,\nthat’s also a sense 💎',
+      advice: 'But don’t carry it all by yourself. Sometimes it’s okay to be sloppy!' }
+  };
+
   // scroll progress (0–1): title fades by 0.10, camera sinks until 0.45,
   // fish swim in between 0.14 and ~0.72, the button appears from 0.86
   var ENTER_START = 0.14, ENTER_GAP = 0.075, ENTER_LEN = 0.14;
@@ -173,6 +231,39 @@
 
   var bubbles = [];
   for (var i = 0; i < 24; i++) bubbles.push({ x: Math.random(), y: Math.random(), v: 0.02 + Math.random() * 0.04, s: Math.random() < 0.3 ? 2 : 1 });
+
+  var hitBtns = FISH.map(function (f) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'fish-hit';
+    b.hidden = true;
+    b.setAttribute('aria-label', 'Meet the ' + PERSONAS[f.id].name);
+    b.addEventListener('click', function () { openCard(f.id, b); });
+    $('fish-hits').appendChild(b);
+    return b;
+  });
+
+  var cardOpener = null;
+  function openCard(id, opener) {
+    var d = PERSONAS[id];
+    $('card-img').src = 'assets/' + id + '.png';
+    $('card-img').alt = d.name;
+    $('card-title').textContent = d.title;
+    $('card-headline').textContent = d.headline;
+    $('card-desc').textContent = d.description;
+    $('card-advice').textContent = d.advice;
+    $('card-back').hidden = false;
+    cardOpener = opener;
+    $('card-close').focus();
+  }
+  function closeCard() {
+    if ($('card-back').hidden) return;
+    $('card-back').hidden = true;
+    if (cardOpener) cardOpener.focus();
+  }
+  $('card-close').addEventListener('click', closeCard);
+  $('card-back').addEventListener('click', function (e) { if (e.target === this) closeCard(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCard(); });
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function seg(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
@@ -217,7 +308,7 @@
     }
 
     // the fish swim in one by one, then float in formation
-    var squidPos = null, sayA = seg(p, 0.90, 0.96);
+    var squidPos = null, sayA = seg(p, 0.90, 0.96), hits = [];
     FISH.forEach(function (f, i) {
       var im = img[f.id];
       if (!im || !im.width) return;
@@ -239,6 +330,19 @@
         if (sayA > 0 && img.squid_wink.width && (reduce || (t % 2.4) < 1.2)) im = img.squid_wink;
       }
       ctx.drawImage(im, Math.round(x - dw / 2), Math.round(y - dh / 2), dw, dh);
+      hits[i] = { x: x - dw / 2, y: y - dh / 2, w: dw, h: dh };
+    });
+
+    // keep each fish's click target on top of where it was just drawn
+    var ck = cv.clientWidth / W;
+    hitBtns.forEach(function (b, i) {
+      var r = hits[i];
+      b.hidden = !r;
+      if (!r) return;
+      b.style.left = Math.round(r.x * ck) + 'px';
+      b.style.top = Math.round(r.y * ck) + 'px';
+      b.style.width = Math.round(r.w * ck) + 'px';
+      b.style.height = Math.round(r.h * ck) + 'px';
     });
 
     var say = $('say');
