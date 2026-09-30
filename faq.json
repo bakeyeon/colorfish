@@ -44,25 +44,6 @@
             "SFF turns each free-text keyword into a three-dimensional vector: <strong>Sentiment</strong> (valence), <strong>Formality</strong> (social distance) and <strong>Friendliness</strong> (warmth). Gemini 2.5 Flash scores every keyword from −1.0 to 1.0 on each axis and returns the result as JSON.",
             "Splitting Formality from Friendliness was informally motivated by Korean honorifics, where formal speech doesn’t by itself imply distance. People often use a formal register with close, familiar addressees in public settings."
           ]
-        },
-        {
-          "question": "What does the dive have to do with it?",
-          "answer": [
-            "The dive pulls apart the physics and the brain. As you go deeper, water absorbs red first, then orange, yellow and green. The pufferfish never changes. Only the light reaching it does.",
-            "At 200 m, two brains repaint the same sea in different ways. That split is the paper in one picture: shared perception, different affective reading."
-          ]
-        },
-        {
-          "question": "Why fish?",
-          "answer": [
-            "Fish live in a world where color really does change with depth. And a sunfish, a pufferfish or a squid is a lot friendlier than a chart. Each of the seven fish stands for one feedback type in the test."
-          ]
-        },
-        {
-          "question": "Is this a medical color vision test?",
-          "answer": [
-            "No. Color Fish Test is a research instrument with playful feedback. It doesn’t diagnose color vision deficiency. For that, see an eye-care professional."
-          ]
         }
       ]
     },
