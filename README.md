@@ -1,6 +1,6 @@
 # Color Fish Test — What Color Fish are you?
 
-A scroll-driven pixel-art landing page for **Color Fish Test**, the experimental platform behind the paper *The Grue Divide: When Cognitive Accuracy Doesn't Predict Affective Alignment* (Kai Hyeyeon Park).
+A scroll-driven pixel-art landing page for **Color Fish Test**, the experimental platform behind the paper *The Grue Divide: When Cognitive Accuracy Doesn't Predict Affective Alignment* (Kai Park).
 
 Scroll to dive in: the camera sinks below the surface and the seven Color Fish swim in one by one, then the page flows into the FAQ.
 
