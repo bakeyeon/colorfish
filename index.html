@@ -98,7 +98,7 @@
   .paper-arrow { margin-left: 6px; font: 700 18px/1 var(--font-body); }
   .paper-icon { width: 24px; height: 28px; fill: var(--sea-600); flex: none; }
   .paper-icon .paper-fill { fill: #ffffff; }
-  /* the 5-minute talk: a thumbnail that swaps in the YouTube player on click */
+  /* the talk video: a thumbnail that swaps in the YouTube player on click */
   .talk { margin: 0 0 var(--px-12); }
   .talk-frame { position: relative; aspect-ratio: 16 / 9; background: var(--abyss-900); border: 3px solid var(--cta-ink); border-radius: var(--radius-md); box-shadow: var(--pixel-drop); overflow: hidden; }
   .talk-frame iframe, .talk-play, .talk-play img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
@@ -221,12 +221,12 @@
 
     <div class="talk">
       <div class="talk-frame" id="talk-frame">
-        <button class="talk-play" id="talk-play" type="button" aria-label="Play the 5-minute talk video">
+        <button class="talk-play" id="talk-play" type="button" aria-label="Play the talk video (8 minutes)">
           <img src="https://i.ytimg.com/vi/bOZgka83TMA/maxresdefault.jpg" alt="" loading="lazy">
-          <span class="talk-btn"><b aria-hidden="true">▶</b> Watch the 5-minute talk</span>
+          <span class="talk-btn"><b aria-hidden="true">▶</b> Watch the talk (8 min)</span>
         </button>
       </div>
-      <p class="talk-note">The paper in five minutes · <a href="https://www.youtube.com/watch?v=bOZgka83TMA" target="_blank" rel="noopener">Open on YouTube ↗</a></p>
+      <p class="talk-note">The paper in eight minutes · <a href="https://www.youtube.com/watch?v=bOZgka83TMA" target="_blank" rel="noopener">Open on YouTube ↗</a></p>
     </div>
 
     <div id="faq-list"></div>
@@ -695,7 +695,7 @@
 document.getElementById('talk-play').addEventListener('click', function () {
   var f = document.createElement('iframe');
   f.src = 'https://www.youtube-nocookie.com/embed/bOZgka83TMA?autoplay=1&rel=0';
-  f.title = 'The Grue Divide: 5-minute talk';
+  f.title = 'The Grue Divide: talk video';
   f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   f.allowFullscreen = true;
   document.getElementById('talk-frame').replaceChildren(f);
